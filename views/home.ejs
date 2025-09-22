@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DevXploit — Simplified Security Intelligence</title>
+    <meta name="theme-color" content="#0a0a0b" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  </head>
+  <body class="bg-zinc-950 text-zinc-100 antialiased min-h-screen font-[Inter] tracking-normal">
+    <!-- Global App Shell -->
+    <div id="app" class="min-h-screen flex flex-col">
+      <!-- Top Nav -->
+      <header class="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-zinc-950/70 bg-zinc-950/80 border-b border-zinc-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="flex items-center justify-center h-8 w-8 rounded-md bg-zinc-900 ring-1 ring-inset ring-zinc-800">
+                <span class="text-zinc-100 text-sm font-semibold tracking-tight">DX</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-zinc-100 text-base sm:text-lg font-semibold tracking-tight leading-none">DevXploit</span>
+                <span class="text-[11px] text-zinc-400 leading-none mt-1">Simplified Security Intelligence</span>
+              </div>
+            </div>
+            <div class="hidden md:flex items-center gap-2">
+              <span class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs text-zinc-300 ring-1 ring-inset ring-zinc-800">
+                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400" style="stroke-width:1.5"></i>
+                Real-time analysis
+              </span>
+              <span class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs text-zinc-300 ring-1 ring-inset ring-zinc-800">
+                <i data-lucide="activity" class="w-4 h-4 text-sky-400" style="stroke-width:1.5"></i>
+                Live updates
+              </span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="flex-1">
+        <!-- Hero / Input Page -->
+        <section id="homeView" class="relative">
+          <!-- Background Visual -->
+          <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute inset-0 opacity-[0.12] bg-[radial-gradient(50%_50%_at_50%_50%,rgba(59,130,246,0.35)_0,rgba(59,130,246,0)_60%)]"></div>
+            <div class="absolute -top-24 -right-24 w-[40rem] h-[40rem] rounded-full blur-3xl opacity-20 bg-sky-500/10"></div>
+          </div>
+
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+            <div class="grid lg:grid-cols-2 gap-10 items-center">
+              <div class="relative">
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-zinc-100">
+                  Security scanning that feels effortless
+                </h1>
+                <p class="mt-4 text-zinc-400 text-base sm:text-lg leading-relaxed">
+                  Enter a target URL and get instant, digestible insights as the scan unfolds. From reconnaissance to exploitation—see the whole picture in real time.
+                </p>
+
+                <div class="mt-8 rounded-xl border border-zinc-800 bg-zinc-900/50 backdrop-blur px-4 py-4 sm:px-6 sm:py-6">
+                  <label for="targetUrl" class="sr-only">Target URL</label>
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <div class="flex-1">
+                      <div class="relative">
+                        <div class="pointer-events-none absolute inset-y-0 left-3 flex items-center">
+                          <i data-lucide="globe" class="h-4 w-4 text-zinc-500" style="stroke-width:1.5"></i>
+                        </div>
+                        <input id="targetUrl" type="text" placeholder="https://example.com"
+                               class="w-full pl-9 pr-3 py-3 rounded-lg bg-zinc-950/70 text-zinc-100 placeholder-zinc-500 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500/50 transition"
+                               />
+                      </div>
+                      <p id="urlHint" class="mt-2 text-[11px] text-zinc-500">
+                        Tip: Include protocol (https://). Staging and localhost supported.
+                      </p>
+                    </div>
+
+                    <div class="flex items-center justify-between sm:justify-end gap-3">
+                      <!-- Custom Toggle -->
+                      <label class="flex items-center gap-2 select-none cursor-pointer group">
+                        <input id="activeScanToggle" type="checkbox" class="sr-only" />
+                        <span class="relative inline-flex h-6 w-11 items-center rounded-full transition ring-1 ring-inset ring-zinc-700 group-hover:ring-zinc-600"
+                              style="background: linear-gradient(0deg, rgba(24,24,27,1) 0%, rgba(9,9,11,1) 100%);">
+                          <span id="activeScanKnob" class="inline-block h-5 w-5 translate-x-1 rounded-full bg-zinc-400 transition-all group-hover:bg-zinc-300"></span>
+                        </span>
+                        <span class="text-xs text-zinc-300">Enable Active Scan</span>
+                      </label>
+
+                      <button id="scanBtn"
+                              class="inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 hover:bg-sky-500 active:bg-sky-600/90 px-4 py-3 text-sm font-medium text-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/60">
+                        <i data-lucide="radar" class="h-4 w-4" style="stroke-width:1.5"></i>
+                        <span>Scan</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Loading State -->
+                  <div id="preScanState" class="hidden mt-4 flex items-center gap-3 text-sm text-zinc-400">
+                    <span class="inline-flex h-4 w-4 rounded-full border-2 border-zinc-700 border-t-sky-500 animate-spin"></span>
+                    Initializing scan...
+                  </div>
+                </div>
+
+                <!-- Trust Indicators -->
+                <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div class="flex items-center gap-3 rounded-lg border border-zinc-800/80 bg-zinc-900/50 px-3 py-2">
+                    <i data-lucide="lock" class="h-4 w-4 text-emerald-400" style="stroke-width:1.5"></i>
+                    <span class="text-xs text-zinc-300">Safe read-only by default</span>
+                  </div>
+                  <div class="flex items-center gap-3 rounded-lg border border-zinc-800/80 bg-zinc-900/50 px-3 py-2">
+                    <i data-lucide="cpu" class="h-4 w-4 text-sky-400" style="stroke-width:1.5"></i>
+                    <span class="text-xs text-zinc-300">Lightweight agentless scan</span>
+                  </div>
+                  <div class="flex items-center gap-3 rounded-lg border border-zinc-800/80 bg-zinc-900/50 px-3 py-2">
+                    <i data-lucide="file-search" class="h-4 w-4 text-violet-400" style="stroke-width:1.5"></i>
+                    <span class="text-xs text-zinc-300">Actionable developer output</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Visual Panel -->
+              <div class="relative">
+                <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 sm:p-8">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <h3 class="text-xl font-semibold tracking-tight">Preview</h3>
+                      <p class="text-sm text-zinc-400 mt-1">A glimpse of the live dashboard.</p>
+                    </div>
+                    <div class="inline-flex items-center gap-2 text-xs text-zinc-400">
+                      <i data-lucide="spark" class="h-4 w-4 text-amber-400" style="stroke-width:1.5"></i>
+                      Real-time
+                    </div>
+                  </div>
+                  <div class="mt-6 space-y-4">
+                    <div class="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950/60 px-4 py-3">
+                      <div class="flex items-center gap-3">
+                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-md bg-zinc-900 ring-1 ring-zinc-800">
+                          <i data-lucide="compass" class="h-3.5 w-3.5 text-sky-400" style="stroke-width:1.5"></i>
+                        </span>
+                        <div>
+                          <p class="text-sm">Reconnaissance</p>
+                          <p class="text-xs text-zinc-500">Fingerprinting headers and tech stack</p>
+                        </div>
+                      </div>
+                      <span class="inline-flex h-2 w-2 rounded-full bg-sky-500/70"></span>
+                    </div>
+                    <div class="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950/60 px-4 py-3">
+                      <div class="flex items-center gap-3">
+                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-md bg-zinc-900 ring-1 ring-zinc-800">
+                          <i data-lucide="beaker" class="h-3.5 w-3.5 text-emerald-400" style="stroke-width:1.5"></i>
+                        </span>
+                        <div>
+                          <p class="text-sm">Vulnerability Checks</p>
+                          <p class="text-xs text-zinc-500">XSS, SQLi, SSRF, CSRF, misconfigurations</p>
+                        </div>
+                      </div>
+                      <span class="inline-flex items-center gap-1 text-emerald-400 text-xs">
+                        <i data-lucide="check" class="h-3.5 w-3.5" style="stroke-width:1.5"></i> Ready
+                      </span>
+                    </div>
+                    <div class="rounded-lg border border-zinc-800 bg-zinc-950/60 px-4 py-4">
+                      <div class="flex items-center justify-between">
+                        <p class="text-sm">Security Score</p>
+                        <span class="text-xs text-zinc-500">Out of 100</span>
+                      </div>
+                      <div class="mt-3">
+                        <div class="relative h-2.5 w-full rounded-full bg-zinc-800 overflow-hidden">
+                          <div class="h-full w-2/3 bg-emerald-500/80 transition-all"></div>
+                        </div>
+                        <div class="mt-2 text-xs text-zinc-400">67 — Moderate risk</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="absolute -z-10 -inset-x-6 -bottom-6 blur-2xl opacity-40 pointer-events-none">
+                  <div class="h-24 bg-gradient-to-b from-sky-500/10 to-transparent rounded-full"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Dashboard / Results Page -->
+        <section id="dashboardView" class="hidden">
+          <!-- Scan Status Bar -->
+          <div class="border-b border-zinc-800 bg-zinc-950/80 backdrop-blur">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <span class="inline-flex h-7 w-7 items-center justify-center rounded-md bg-zinc-900 ring-1 ring-zinc-800">
+                    <i data-lucide="link-2" class="h-4 w-4 text-sky-400" style="stroke-width:1.5"></i>
+                  </span>
+                  <div class="min-w-0">
+                    <p id="targetDisplay" class="truncate text-sm font-medium">https://example.com</p>
+                    <p class="text-[11px] text-zinc-500">Passive scan — safe by default</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-4">
+                  <div class="w-48">
+                    <div class="h-1.5 w-full rounded-full bg-zinc-800 overflow-hidden">
+                      <div id="scanProgressBar" class="h-full w-0 bg-sky-500 transition-all"></div>
+                    </div>
+                    <div id="scanProgressText" class="text-[11px] text-zinc-500 mt-1">Initializing...</div>
+                  </div>
+                  <div id="scanStatusBadge" class="inline-flex items-center gap-2 rounded-md px-2.5 py-1 text-xs ring-1 ring-inset ring-zinc-800 text-zinc-300">
+                    <span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span> Scanning
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Grid -->
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              <!-- Left: Kill Chain Graph -->
+              <div class="xl:col-span-2 space-y-6">
+                <div class="rounded-xl border border-zinc-800 bg-zinc-900/40">
+                  <div class="px-5 py-4 border-b border-zinc-800">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <h2 class="text-xl font-semibold tracking-tight">Attack Kill Chain</h2>
+                        <p class="text-sm text-zinc-400">Follow the path from recon to post-exploitation.</p>
+                      </div>
+                      <div class="text-xs text-zinc-400 hidden sm:block">Click nodes to explore</div>
+                    </div>
+                  </div>
+                  <div class="p-4 sm:p-6">
+                    <!-- Graph Canvas (SVG) -->
+                    <div class="relative overflow-hidden">
+                      <svg id="killChainSvg" viewBox="0 0 1000 250" class="w-full h-[260px]">
+                        <!-- Edges -->
+                        <line x1="100" y1="125" x2="300" y2="125" class="stroke-zinc-700" stroke-width="2" />
+                        <line x1="300" y1="125" x2="500" y2="125" class="stroke-zinc-700" stroke-width="2" />
+                        <line x1="500" y1="125" x2="700" y2="125" class="stroke-zinc-700" stroke-width="2" />
+                        <line x1="700" y1="125" x2="900" y2="125" class="stroke-zinc-700" stroke-width="2" />
+
+                        <!-- Nodes -->
+                        <g class="cursor-pointer" data-phase="recon" transform="translate(100,125)">
+                          <circle r="36" class="fill-zinc-900 stroke-zinc-700" stroke-width="2"></circle>
+                          <circle r="44" class="fill-transparent stroke-sky-500/0 transition-all" stroke-width="2"></circle>
+                          <foreignObject x="-14" y="-14" width="28" height="28">
+                            <div class="w-full h-full flex items-center justify-center">
+                              <i data-lucide="radar" class="h-6 w-6 text-sky-400" style="stroke-width:1.5"></i>
+                            </div>
+                          </foreignObject>
+                          <text x="0" y="60" text-anchor="middle" class="fill-zinc-300 text-sm">Recon</text>
+                        </g>
+
+                        <g class="cursor-pointer" data-phase="enum" transform="translate(300,125)">
+                          <circle r="36" class="fill-zinc-900 stroke-zinc-700" stroke-width="2"></circle>
+                          <circle r="44" class="fill-transparent stroke-sky-500/0 transition-all" stroke-width="2"></circle>
+                          <foreignObject x="-14" y="-14" width="28" height="28">
+                            <div class="w-full h-full flex items-center justify-center">
+                              <i data-lucide="list-tree" class="h-6 w-6 text-sky-400" style="stroke-width:1.5"></i>
+                            </div>
+                          </foreignObject>
+                          <text x="0" y="60" text-anchor="middle" class="fill-zinc-300 text-sm">Enumeration</text>
+                        </g>
+
+                        <g class="cursor-pointer" data-phase="vuln" transform="translate(500,125)">
+                          <circle r="36" class="fill-zinc-900 stroke-zinc-700" stroke-width="2"></circle>
+                          <circle r="44" class="fill-transparent stroke-amber-500/0 transition-all" stroke-width="2"></circle>
+                          <foreignObject x="-14" y="-14" width="28" height="28">
+                            <div class="w-full h-full flex items-center justify-center">
+                              <i data-lucide="alert-triangle" class="h-6 w-6 text-amber-400" style="stroke-width:1.5"></i>
+                            </div>
+                          </foreignObject>
+                          <text x="0" y="60" text-anchor="middle" class="fill-zinc-300 text-sm">Vulnerabilities</text>
+                        </g>
+
+                        <g class="cursor-pointer" data-phase="exploit" transform="translate(700,125)">
+                          <circle r="36" class="fill-zinc-900 stroke-zinc-700" stroke-width="2"></circle>
+                          <circle r="44" class="fill-transparent stroke-red-500/0 transition-all" stroke-width="2"></circle>
+                          <foreignObject x="-14" y="-14" width="28" height="28">
+                            <div class="w-full h-full flex items-center justify-center">
+                              <i data-lucide="zap" class="h-6 w-6 text-red-400" style="stroke-width:1.5"></i>
+                            </div>
+                          </foreignObject>
+                          <text x="0" y="60" text-anchor="middle" class="fill-zinc-300 text-sm">Exploitation</text>
+                        </g>
+
+                        <g class="cursor-pointer" data-phase="post" transform="translate(900,125)">
+                          <circle r="36" class="fill-zinc-900 stroke-zinc-700" stroke-width="2"></circle>
+                          <circle r="44" class="fill-transparent stroke-emerald-500/0 transition-all" stroke-width="2"></circle>
+                          <foreignObject x="-14" y="-14" width="28" height="28">
+                            <div class="w-full h-full flex items-center justify-center">
+                              <i data-lucide="key-round" class="h-6 w-6 text-emerald-400" style="stroke-width:1.5"></i>
+                            </div>
+                          </Object>
+                          <text x="0" y="60" text-anchor="middle" class="fill-zinc-300 text-sm">Post-Exploitation</text>
+                        </g>
+                      </svg>
+                    </div>
+
+                    <!-- Phase Details -->
+                    <div class="mt-4 rounded-lg border border-zinc-800 bg-zinc-950/50 p-4 sm:p-5">
+                      <div class="flex items-start justify-between gap-4">
+                        <div class="min-w-0">
+                          <p id="phaseTitle" class="text-base sm:text-lg font-semibold tracking-tight">Reconnaissance</p>
+                          <p id="phaseDesc" class="text-sm text-zinc-400 mt-1">
+                            Mapping subdomains, tech stack, headers, and public artifacts to profile the target.
+                          </p>
+                        </div>
+                        <span id="phaseBadge" class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] ring-1 ring-inset ring-zinc-800 text-zinc-300">
+                          <i data-lucide="info" class="h-3.5 w-3.5" style="stroke-width:1.5"></i> Passive
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Detailed Findings -->
+                <div class="rounded-xl border border-zinc-800 bg-zinc-900/40">
+                  <div class="px-5 py-4 border-b border-zinc-800 flex items-center justify-between">
+                    <div>
+                      <h2 class="text-xl font-semibold tracking-tight">Detailed Findings</h2>
+                      <p class="text-sm text-zinc-400">Expand items to see narratives and remediation steps.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button id="filterCritical" class="hidden sm:inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs ring-1 ring-zinc-800 text-zinc-300 hover:bg-zinc-800/50 transition">
+                        <span class="h-2 w-2 rounded-full bg-red-500"></span> Critical only
+                      </button>
+                      <button id="clearFilters" class="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs ring-1 ring-zinc-800 text-zinc-300 hover:bg-zinc-800/50 transition">
+                        <i data-lucide="x" class="h-3.5 w-3.5" style="stroke-width:1.5"></i> Clear
+                      </button>
+                    </div>
+                  </div>
+
+                  <div id="findingsList" class="divide-y divide-zinc-800">
+                    <!-- Items appended via JS -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Metrics -->
+              <div class="space-y-6">
+                <!-- Score and Summary -->
+                <div class="rounded-xl border border-zinc-800 bg-zinc-900/40">
+                  <div class="px-5 py-4 border-b border-zinc-800">
+                    <h2 class="text-xl font-semibold tracking-tight">Security Score</h2>
+                    <p class="text-sm text-zinc-400">Lower is riskier. Improve by fixing high-severity issues.</p>
+                  </div>
+                  <div class="p-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div class="rounded-lg border border-zinc-800 bg-zinc-950/50 p-4">
+                        <div class="flex items-center justify-between">
+                          <span class="text-sm text-zinc-300">Overall</span>
+                          <span id="scoreLabel" class="text-xs text-zinc-500">100</span>
+                        </div>
+                        <div class="mt-3">
+                          <div class="w-full">
+                            <div class="relative">
+                              <!-- Wrap canvas in a div to avoid canvas sizing bug -->
+                              <div class="mx-auto w-36 h-36">
+                                <canvas id="scoreChart"></canvas>
+                              </div>
+                            </div>
+                          </div>
+                          <div id="scoreState" class="mt-2 text-xs text-zinc-400 text-center">Excellent</div>
+                        </div>
+                      </div>
+
+                      <div class="rounded-lg border border-zinc-800 bg-zinc-950/50 p-4">
+                        <div class="flex items-center justify-between">
+                          <span class="text-sm text-zinc-300">Scan Mode</span>
+                          <span id="modeBadge" class="inline-flex items-center gap-1 text-xs rounded-md px-2 py-1 ring-1 ring-zinc-800">
+                            <span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span> Passive
+                          </span>
+                        </div>
+                        <div class="mt-4 space-y-2">
+                          <div class="flex items-center justify-between text-sm">
+                            <span class="inline-flex items-center gap-2">
+                              <span class="h-2 w-2 rounded-full bg-red-500"></span> Critical
+                            </span>
+                            <span id="countCritical" class="text-zinc-300">0</span>
+                          </div>
+                          <div class="flex items-center justify-between text-sm">
+                            <span class="inline-flex items-center gap-2">
+                              <span class="h-2 w-2 rounded-full bg-orange-500"></span> High
+                            </span>
+                            <span id="countHigh" class="text-zinc-300">0</span>
+                          </div>
+                          <div class="flex items-center justify-between text-sm">
+                            <span class="inline-flex items-center gap-2">
+                              <span class="h-2 w-2 rounded-full bg-amber-400"></span> Medium
+                            </span>
+                            <span id="countMedium" class="text-zinc-300">0</span>
+                          </div>
+                          <div class="flex items-center justify-between text-sm">
+                            <span class="inline-flex items-center gap-2">
+                              <span class="h-2 w-2 rounded-full bg-emerald-400"></span> Low
+                            </span>
+                            <span id="countLow" class="text-zinc-300">0</span>
+                          </div>
+                          <div class="flex items-center justify-between text-sm">
+                            <span class="inline-flex items-center gap-2">
+                              <span class="h-2 w-2 rounded-full bg-sky-400"></span> Info
+                            </span>
+                            <span id="countInfo" class="text-zinc-300">0</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mt-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+                      <div class="flex items-center gap-2 text-xs text-zinc-400">
+                        <i data-lucide="clock" class="h-4 w-4" style="stroke-width:1.5"></i>
+                        <span id="elapsedTime">00:00</span> elapsed
+                      </div>
+                      <div class="mt-3 relative h-1.5 w-full rounded-full bg-zinc-800 overflow-hidden">
+                        <div id="timelineBar" class="h-full w-0 bg-emerald-500 transition-all"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Activity / Events -->
+                <div class="rounded-xl border border-zinc-800 bg-zinc-900/40">
+                  <div class="px-5 py-4 border-b border-zinc-800">
+                    <h2 class="text-xl font-semibold tracking-tight">Events</h2>
+                    <p class="text-sm text-zinc-400">Live stream of notable scan events.</p>
+                  </div>
+                  <div id="eventsFeed" class="p-4 space-y-3 max-h-[360px] overflow-auto">
+                    <!-- Events appended via JS -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- Footer -->
+      <footer class="border-t border-zinc-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div class="flex flex-col md:flex-row items-center justify-between gap-3">
+            <p class="text-xs text-zinc-500">© <span id="year"></span> DevXploit. All rights reserved.</p>
+            <div class="flex items-center gap-4">
+              <a href="#" class="text-xs text-zinc-400 hover:text-zinc-300 transition">Privacy</a>
+              <a href="#" class="text-xs text-zinc-400 hover:text-zinc-300 transition">Terms</a>
+              <a href="#" class="text-xs text-zinc-400 hover:text-zinc-300 transition">Status</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      // Initialize Icons
+      document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons({ attrs: { "stroke-width": 1.5 } });
+        document.getElementById('year').textContent = new Date().getFullYear();
+      });
+
+      // Elements
+      const homeView = document.getElementById('homeView');
+      const dashboardView = document.getElementById('dashboardView');
+      const scanBtn = document.getElementById('scanBtn');
+      const targetInput = document.getElementById('targetUrl');
+      const targetDisplay = document.getElementById('targetDisplay');
+      const preScanState = document.getElementById('preScanState');
+      const progressBar = document.getElementById('scanProgressBar');
+      const progressText = document.getElementById('scanProgressText');
+      const scanStatusBadge = document.getElementById('scanStatusBadge');
+      const activeScanToggle = document.getElementById('activeScanToggle');
+      const activeScanKnob = document.getElementById('activeScanKnob');
+      const modeBadge = document.getElementById('modeBadge');
+      const filterCritical = document.getElementById('filterCritical');
+      const clearFilters = document.getElementById('clearFilters');
+      const findingsList = document.getElementById('findingsList');
+      const eventsFeed = document.getElementById('eventsFeed');
+      const timelineBar = document.getElementById('timelineBar');
+      const elapsedTime = document.getElementById('elapsedTime');
+
+      // Kill chain elements
+      const killChainSvg = document.getElementById('killChainSvg');
+      const phaseTitle = document.getElementById('phaseTitle');
+      const phaseDesc = document.getElementById('phaseDesc');
+      const phaseBadge = document.getElementById('phaseBadge');
+
+      // Severity counts
+      const countEls = {
+        Critical: document.getElementById('countCritical'),
+        High: document.getElementById('countHigh'),
+        Medium: document.getElementById('countMedium'),
+        Low: document.getElementById('countLow'),
+        Info: document.getElementById('countInfo'),
+      };
+
+      // Score chart
+      let scoreChart;
+      const scoreLabel = document.getElementById('scoreLabel');
+      const scoreState = document.getElementById('scoreState');
+
+      // Toggle UI
+      activeScanToggle.addEventListener('change', () => {
+        const on = activeScanToggle.checked;
+        activeScanKnob.style.transform = on ? 'translateX(20px)' : 'translateX(4px)';
+        activeScanKnob.classList.toggle('bg-emerald-400', on);
+        activeScanKnob.classList.toggle('bg-zinc-400', !on);
+        modeBadge.innerHTML = (on
+          ? '<span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span> Active'
+          : '<span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span> Passive');
+      });
+      // Initialize knob position
+      activeScanToggle.dispatchEvent(new Event('change'));
+
+      // Phase content
+      const phases = {
+        recon: {
+          title: 'Reconnaissance',
+          desc: 'Mapping subdomains, technologies, headers, robots, and exposed metadata.',
+          badge: { text: 'Passive', icon: 'info' }
+        },
+        enum: {
+          title: 'Enumeration',
+          desc: 'Crawling endpoints, forms, parameters, and discovering surface area.',
+          badge: { text: 'Passive', icon: 'list' }
+        },
+        vuln: {
+          title: 'Vulnerability Discovery',
+          desc: 'Testing for XSS, SQLi, SSRF, CSRF, open redirects, misconfigurations, and weak policies.',
+          badge: { text: 'Mixed', icon: 'beaker' }
+        },
+        exploit: {
+          title: 'Exploitation',
+          desc: 'Validating findings with safe proofs-of-concept to reduce false positives.',
+          badge: { text: 'Active', icon: 'zap' }
+        },
+        post: {
+          title: 'Post-Exploitation',
+          desc: 'Assessing potential impact, lateral movement, and data exposure scenarios.',
+          badge: { text: 'Analysis', icon: 'key-round' }
+        }
+      };
+
+      function setPhase(key) {
+        const data = phases[key];
+        phaseTitle.textContent = data.title;
+        phaseDesc.textContent = data.desc;
+        phaseBadge.innerHTML = `<i data-lucide="${data.badge.icon}" class="h-3.5 w-3.5" style="stroke-width:1.5"></i> ${data.text}`;
+        lucide.createIcons({ attrs: { "stroke-width": 1.5 } });
+      }
+
+      // Highlight nodes during scan
+      function glowNode(phase, colorClass) {
+        const node = killChainSvg.querySelector(`g[data-phase="${phase}"] circle:nth-child(2)`);
+        if (node) {
+          node.classList.remove('stroke-sky-500/0','stroke-amber-500/0','stroke-red-500/0','stroke-emerald-500/0');
+          node.classList.add(colorClass);
+        }
+      }
+
+      // Kill chain node click handlers
+      killChainSvg.querySelectorAll('g[data-phase]').forEach(g => {
+        g.addEventListener('click', () => {
+          const phase = g.getAttribute('data-phase');
+          setPhase(phase);
+          // Focus ring on click
+          killChainSvg.querySelectorAll('g[data-phase] circle:first-child').forEach(c => {
+            c.classList.remove('ring-2','ring-sky-500/40');
+          });
+          g.querySelector('circle:first-child').classList.add('ring-2','ring-sky-500/40');
+        });
+      });
+
+      // Events feed
+      function pushEvent(icon, color, text) {
+        const item = document.createElement('div');
+        item.className = 'flex items-start gap-3 rounded-lg border border-zinc-800 bg-zinc-950/60 p-3';
+        item.innerHTML = `
+          <span class="inline-flex h-7 w-7 items-center justify-center rounded-md bg-zinc-900 ring-1 ring-zinc-800">
+            <i data-lucide="${icon}" class="h-4 w-4 ${color}" style="stroke-width:1.5"></i>
+          </span>
+          <p class="text-sm text-zinc-300">${text}</p>
+        `;
+        eventsFeed.prepend(item);
+        lucide.createIcons({ attrs: { "stroke-width": 1.5 } });
+      }
+
+      // Findings rendering
+      const severityColors = {
+        Critical: 'bg-red-500 text-white',
+        High: 'bg-orange-500 text-white',
+        Medium: 'bg-amber-400 text-zinc-900',
+        Low: 'bg-emerald-400 text-zinc-900',
+        Info: 'bg-sky-400 text-zinc-900',
+      };
+
+      const severityWeights = {
+        Critical: 30,
+        High: 20,
+        Medium: 10,
+        Low: 5,
+        Info: 2,
+      };
+
+      let currentScore = 100;
+      let elapsedSeconds = 0;
+      let scanInterval;
+      let timerInterval;
+      const counts = { Critical: 0, High: 0, Medium: 0, Low: 0, Info: 0 };
+
+      function updateCounts() {
+        for (const k in counts) countEls[k].textContent = counts[k];
+      }
+
+      function updateScore(delta) {
+        currentScore = Math.max(5, currentScore - delta);
+        scoreLabel.textContent = currentScore;
+        scoreState.textContent =
+          currentScore >= 90 ? 'Excellent' :
+          currentScore >= 75 ? 'Good' :
+          currentScore >= 60 ? 'Moderate' :
+          currentScore >= 45 ? 'Elevated' : 'Critical';
+
+        scoreChart.data.datasets[0].data = [currentScore, 100 - currentScore];
+        scoreChart.update();
+      }
+
+      function renderFindingCard(finding) {
+        const item = document.createElement('div');
+        item.className = 'p-4 sm:p-5';
+        item.setAttribute('data-severity', finding.severity);
+
+        const badge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] ring-1 ring-inset ring-zinc-800 ${severityColors[finding.severity] ? '' : ''}">
+            <span class="h-1.5 w-1.5 rounded-full ${finding.severity==='Critical'?'bg-red-600':finding.severity==='High'?'bg-orange-600':finding.severity==='Medium'?'bg-amber-500':finding.severity==='Low'?'bg-emerald-500':'bg-sky-500'}"></span>
+            ${finding.severity}
+          </span>`;
+
+        item.innerHTML = `
+          <div class="flex items-start justify-between gap-4">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <p class="text-sm sm:text-base font-medium text-zinc-100">${finding.name}</p>
+                ${badge}
+              </div>
+              <p class="text-xs text-zinc-400 mt-1 break-all">${finding.location}</p>
+            </div>
+            <button class="expandBtn inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs ring-1 ring-zinc-800 text-zinc-300 hover:bg-zinc-800/50 transition">
+              <i data-lucide="chevron-down" class="h-3.5 w-3.5" style="stroke-width:1.5"></i> Details
+            </button>
+          </div>
+          <div class="details mt-4 hidden">
+            <div class="rounded-lg border border-zinc-800 bg-zinc-950/60 p-4">
+              <div class="flex items-center gap-2 text-xs text-zinc-400">
+                <i data-lucide="swords" class="h-4 w-4 text-amber-400" style="stroke-width:1.5"></i>
+                Attacker Narrative
+              </div>
+              <div class="mt-2 text-sm text-zinc-300 whitespace-pre-line">${finding.narrative}</div>
+            </div>
+            <div class="rounded-lg border border-zinc-800 bg-zinc-950/60 p-4 mt-3">
+              <div class="flex items-center gap-2 text-xs text-zinc-400">
+                <i data-lucide="wrench" class="h-4 w-4 text-emerald-400" style="stroke-width:1.5"></i>
+                Remediation
+              </div>
+              <div class="mt-2 text-sm text-zinc-300">${finding.remediation}</div>
+              <div class="mt-3">
+                <pre class="text-xs leading-relaxed overflow-auto rounded-md border border-zinc-800 bg-zinc-950/90 p-3 text-zinc-300"><code>${finding.code}</code></pre>
+              </div>
+            </div>
+          </div>
+        `;
+
+        findingsList.prepend(item);
+        lucide.createIcons({ attrs: { "stroke-width": 1.5 } });
+
+        // Expand/collapse
+        item.querySelector('.expandBtn').addEventListener('click', () => {
+          const details = item.querySelector('.details');
+          details.classList.toggle('hidden');
+          const icon = item.querySelector('.expandBtn i');
+          icon.setAttribute('data-lucide', details.classList.contains('hidden') ? 'chevron-down' : 'chevron-up');
+          lucide.createIcons({ attrs: { "stroke-width": 1.5 } });
+        });
+      }
+
+      // Demo vulnerabilities stream
+      const demoFindings = [
+        {
+          at: 18,
+          phase: 'vuln',
+          severity: 'High',
+          name: 'Reflected XSS',
+          location: 'GET /search?q=',
+          narrative: '1. Victim clicks a crafted link\n2. Query parameter injects script into response\n3. Script executes in user context, stealing session',
+          remediation: 'Sanitize and encode user-controlled input before reflection.',
+          code: `// Example fix (Express.js)
+app.get('/search', (req, res) => {
+  const q = req.query.q || '';
+  const safe = escapeHtml(q); // encode < > " ' &
+  res.render('search', { q: safe });
+});`
+        },
+        {
+          at: 30,
+          phase: 'vuln',
+          severity: 'Critical',
+          name: 'SQL Injection',
+          location: 'POST /auth/login [username]',
+          narrative: '1. Attacker submits payload \' OR 1=1 --\n2. Query concatenation bypasses auth\n3. Potential data extraction via UNION SELECT',
+          remediation: 'Use parameterized queries and least-privilege DB roles.',
+          code: `-- Insecure
+sql = "SELECT * FROM users WHERE username='" + user + "' AND pass='" + pass + "'";
+
+-- Secure (PostgreSQL)
+SELECT * FROM users WHERE username=$1 AND pass=crypt($2, pass);`
+        },
+        {
+          at: 42,
+          phase: 'exploit',
+          severity: 'Medium',
+          name: 'Open Redirect',
+          location: 'GET /redirect?url=',
+          narrative: '1. Phishing link abuses redirect endpoint\n2. Victim trusts domain and is redirected to malicious site',
+          remediation: 'Implement allowlist of redirect targets; reject external domains.',
+          code: `const allow = new Set(['https://app.example.com']);
+const url = new URL(req.query.url, 'https://app.example.com');
+if (!allow.has(url.origin)) return res.status(400).send('Invalid target');
+res.redirect(url.href);`
+        },
+        {
+          at: 56,
+          phase: 'vuln',
+          severity: 'Low',
+          name: 'Clickjacking',
+          location: 'Missing X-Frame-Options / CSP frame-ancestors',
+          narrative: '1. Page can be embedded in a malicious iframe\n2. Attacker overlays UI to trick clicks',
+          remediation: 'Send X-Frame-Options: DENY or configure frame-ancestors in CSP.',
+          code: `// Example (Node/helmet)
+app.use(helmet.frameguard({ action: 'deny' }));
+// Or CSP
+Content-Security-Policy: frame-ancestors 'none';`
+        },
+        {
+          at: 68,
+          phase: 'post',
+          severity: 'Info',
+          name: 'Server Banner Exposed',
+          location: 'Response header: Server: nginx/1.18',
+          narrative: '1. Version disclosure aids targeting known exploits.',
+          remediation: 'Hide or generalize server banner.',
+          code: `# nginx
+server_tokens off;`
+        },
+      ];
+
+      function severityColorClass(sev) {
+        return {
+          Critical: 'text-red-400',
+          High: 'text-orange-400',
+          Medium: 'text-amber-300',
+          Low: 'text-emerald-300',
+          Info: 'text-sky-300',
+        }[sev] || 'text-zinc-300';
+      }
+
+      function startTimer() {
+        const start = Date.now();
+        timerInterval = setInterval(() => {
+          elapsedSeconds = Math.floor((Date.now() - start) / 1000);
+          const m = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+          const s = String(elapsedSeconds % 60).padStart(2, '0');
+          elapsedTime.textContent = `${m}:${s}`;
+          timelineBar.style.width = Math.min(100, (elapsedSeconds / 75) * 100) + '%';
+        }, 1000);
+      }
+
+      function finalizeScan() {
+        clearInterval(scanInterval);
+        clearInterval(timerInterval);
+        progressBar.style.width = '100%';
+        progressText.textContent = 'Completed';
+        scanStatusBadge.innerHTML = '<span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Completed';
+        pushEvent('check-circle-2', 'text-emerald-400', 'Scan completed. Reports ready for review.');
+        glowNode('post', 'stroke-emerald-500/60');
+      }
+
+      function initScoreChart() {
+        const ctx = document.getElementById('scoreChart').getContext('2d');
+        scoreChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Score', 'Risk'],
+            datasets: [{
+              data: [100, 0],
+              backgroundColor: ['#22c55e', 'rgba(39,39,42,0.8)'],
+              borderWidth: 0,
+              hoverOffset: 2,
+              cutout: '72%',
+            }]
+          },
+          options: {
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: false }
+            },
+            responsive: true,
+            maintainAspectRatio: false
+          }
+        });
+      }
+
+      // Scan flow simulation
+      function runScanFlow() {
+        let t = 0;
+        const total = 75; // seconds simulated
+        scanInterval = setInterval(() => {
+          t++;
+          const pct = Math.min(100, Math.round((t / total) * 100));
+          progressBar.style.width = pct + '%';
+          progressText.textContent = pct < 100 ? `Scanning... ${pct}%` : 'Finalizing...';
+
+          // Phase transitions
+          if (t === 5) { setPhase('recon'); glowNode('recon','stroke-sky-500/60'); pushEvent('radar','text-sky-400', 'Reconnaissance started: headers, robots, SSL, tech stack.'); }
+          if (t === 15) { setPhase('enum'); glowNode('enum','stroke-sky-500/60'); pushEvent('list-tree','text-sky-400', 'Enumerating endpoints and parameters.'); }
+          if (t === 25) { setPhase('vuln'); glowNode('vuln','stroke-amber-500/60'); pushEvent('beaker','text-amber-400', 'Running vulnerability checks.'); }
+          if (t === 45) { setPhase('exploit'); glowNode('exploit','stroke-red-500/60'); pushEvent('zap','text-red-400', 'Validating critical findings (safe PoC).'); }
+          if (t === 65) { setPhase('post'); glowNode('post','stroke-emerald-500/60'); pushEvent('key-round','text-emerald-400', 'Assessing impact and exposure.'); }
+
+          // Stream findings
+          demoFindings.forEach(f => {
+            if (f.at === t) {
+              counts[f.severity]++;
+              updateCounts();
+              updateScore(severityWeights[f.severity]);
+              renderFindingCard(f);
+              pushEvent(
+                f.severity === 'Critical' ? 'alert-octagon' : 'alert-triangle',
+                severityColorClass(f.severity),
+                `${f.severity} — ${f.name} at ${f.location}`
+              );
+            }
+          });
+
+          if (pct >= 100) {
+            finalizeScan();
+          }
+        }, 1000);
+      }
+
+      function validateUrl(url) {
+        try {
+          const u = new URL(url);
+          return u.protocol === 'http:' || u.protocol === 'https:';
+        } catch { return false; }
+      }
+
+      // Filters
+      let criticalOnly = false;
+      filterCritical.addEventListener('click', () => {
+        criticalOnly = true;
+        Array.from(findingsList.children).forEach(el => {
+          el.style.display = el.getAttribute('data-severity') === 'Critical' ? '' : 'none';
+        });
+      });
+      clearFilters.addEventListener('click', () => {
+        criticalOnly = false;
+        Array.from(findingsList.children).forEach(el => el.style.display = '');
+      });
+
+      // Scan button handler
+      scanBtn.addEventListener('click', () => {
+        const url = targetInput.value.trim() || 'https://example.com';
+        if (!validateUrl(url)) {
+          document.getElementById('urlHint').textContent = 'Invalid URL. Please include http:// or https://';
+          document.getElementById('urlHint').classList.remove('text-zinc-500');
+          document.getElementById('urlHint').classList.add('text-red-400');
+          return;
+        }
+
+        // Reset state
+        findingsList.innerHTML = '';
+        eventsFeed.innerHTML = '';
+        counts.Critical = counts.High = counts.Medium = counts.Low = counts.Info = 0;
+        updateCounts();
+        currentScore = 100;
+        scoreLabel.textContent = '100';
+        scoreState.textContent = 'Excellent';
+        if (scoreChart) {
+          scoreChart.data.datasets[0].data = [100, 0];
+          scoreChart.update();
+        }
+
+        // Transition
+        preScanState.classList.remove('hidden');
+        scanBtn.disabled = true;
+        scanBtn.classList.add('opacity-80','cursor-not-allowed');
+        setTimeout(() => {
+          homeView.classList.add('hidden');
+          dashboardView.classList.remove('hidden');
+          targetDisplay.textContent = url;
+          progressBar.style.width = '0%';
+          progressText.textContent = 'Initializing...';
+          scanStatusBadge.innerHTML = '<span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span> Scanning';
+          // Reset glow
+          killChainSvg.querySelectorAll('g[data-phase] circle:nth-child(2)').forEach(c => {
+            c.classList.remove('stroke-sky-500/60','stroke-amber-500/60','stroke-red-500/60','stroke-emerald-500/60');
+            c.classList.add('stroke-sky-500/0','stroke-amber-500/0','stroke-red-500/0','stroke-emerald-500/0');
+          });
+
+          // Mode
+          const active = activeScanToggle.checked;
+          modeBadge.innerHTML = active
+            ? '<span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span> Active'
+            : '<span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span> Passive';
+          pushEvent('play-circle','text-sky-400', `Scan started for ${url} (${active ? 'Active' : 'Passive'})`);
+
+          initScoreChart();
+          runScanFlow();
+          startTimer();
+        }, 900);
+      });
+
+      // Initialize chart container once visible
+      const onVisible = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !scoreChart) {
+            initScoreChart();
+          }
+        });
+      });
+      onVisible.observe(document.getElementById('dashboardView'));
+    </script>
+  </body>
+</html>
