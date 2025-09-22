@@ -266,6 +266,80 @@ class DevXploitDashboard {
         if (progressText && phase) {
             progressText.textContent = phase;
         }
+        
+        // Update kill chain highlighting based on progress
+        this.updateKillChainProgress(progress, phase);
+    }
+
+    updateKillChainProgress(progress, phase) {
+        // Define phase mapping based on progress ranges
+        const phaseMapping = [
+            { min: 0, max: 20, phase: 'recon', color: 'stroke-sky-500/60' },
+            { min: 20, max: 40, phase: 'enum', color: 'stroke-sky-500/60' },
+            { min: 40, max: 70, phase: 'vuln', color: 'stroke-amber-500/60' },
+            { min: 70, max: 90, phase: 'exploit', color: 'stroke-red-500/60' },
+            { min: 90, max: 100, phase: 'post', color: 'stroke-emerald-500/60' }
+        ];
+        
+        // Reset all circles to default state
+        const allPhases = ['recon', 'enum', 'vuln', 'exploit', 'post'];
+        allPhases.forEach(phaseName => {
+            const node = document.querySelector(`[data-phase="${phaseName}"] circle:nth-child(2)`);
+            if (node) {
+                node.classList.remove('stroke-sky-500/60', 'stroke-amber-500/60', 'stroke-red-500/60', 'stroke-emerald-500/60');
+                node.classList.add('stroke-sky-500/0'); // Default invisible state
+                node.style.animation = ''; // Remove any animation
+            }
+        });
+        
+        // Highlight completed phases
+        phaseMapping.forEach(mapping => {
+            if (progress > mapping.max) {
+                const node = document.querySelector(`[data-phase="${mapping.phase}"] circle:nth-child(2)`);
+                if (node) {
+                    node.classList.remove('stroke-sky-500/0', 'stroke-amber-500/0', 'stroke-red-500/0', 'stroke-emerald-500/0');
+                    node.classList.add(mapping.color);
+                }
+            }
+        });
+        
+        // Add pulsing effect to current active phase
+        const currentMapping = phaseMapping.find(mapping => progress >= mapping.min && progress <= mapping.max);
+        if (currentMapping) {
+            const activeNode = document.querySelector(`[data-phase="${currentMapping.phase}"] circle:nth-child(2)`);
+            if (activeNode) {
+                activeNode.classList.remove('stroke-sky-500/0', 'stroke-amber-500/0', 'stroke-red-500/0', 'stroke-emerald-500/0');
+                activeNode.classList.add(currentMapping.color);
+                // Add pulsing animation
+                activeNode.style.animation = 'pulse 2s infinite';
+            }
+        }
+    }
+
+    mapPhaseNameToId(phaseName) {
+        // Map phase names from backend to kill chain IDs
+        const phaseMap = {
+            'Initializing scan': 'recon',
+            'Starting reconnaissance': 'recon',
+            'Reconnaissance': 'recon',
+            'Gathering information': 'recon',
+            'Enumerating endpoints': 'enum',
+            'Enumeration': 'enum',
+            'Crawling': 'enum',
+            'Scanning for vulnerabilities': 'vuln',
+            'Vulnerability assessment': 'vuln',
+            'Testing for XSS': 'vuln',
+            'Testing for SQL injection': 'vuln',
+            'Active scanning': 'exploit',
+            'Exploitation': 'exploit',
+            'Testing exploits': 'exploit',
+            'Post-exploitation analysis': 'post',
+            'Analyzing results': 'post',
+            'Generating report': 'post',
+            'Completed': 'post'
+        };
+        
+        return phaseMap[phaseName] || null;
     }
 
     updateElapsedTime(startTime, endTime = null) {
