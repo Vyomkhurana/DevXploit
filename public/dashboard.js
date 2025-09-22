@@ -118,6 +118,13 @@ class DevXploitDashboard {
             this.showNotification('Active scan enabled but OWASP ZAP is not running. Using basic checks only.', 'info');
         }
 
+        // Store scan start time and start timer
+        this.scanStartTime = new Date();
+        this.startElapsedTimer();
+        
+        // Set initial scan status
+        this.updateScanStatus('scanning');
+
         try {
             // Start the scan
             const response = await fetch('/api/scan', {
@@ -174,7 +181,21 @@ class DevXploitDashboard {
 
         this.scanInterval = setInterval(async () => {
             await this.checkScanStatus();
-        }, 2000); // Poll every 2 seconds
+        }, 2000);
+    }
+
+    startElapsedTimer() {
+        // Clear any existing timer
+        if (this.elapsedTimer) {
+            clearInterval(this.elapsedTimer);
+        }
+        
+        // Start new timer that updates every second
+        this.elapsedTimer = setInterval(() => {
+            if (this.scanStartTime) {
+                this.updateElapsedTime(this.scanStartTime.toISOString());
+            }
+        }, 1000);
     }
 
     async checkScanStatus() {
@@ -188,16 +209,42 @@ class DevXploitDashboard {
             console.log('Scan data received:', scanData);
 
             if (response.ok) {
-                this.updateProgress(scanData.progress, scanData.currentPhase);
+                this.updateProgress(scanData.progress, scanData.currentStep || scanData.currentPhase);
+                
+                // Update elapsed time during scan
+                if (scanData.startTime) {
+                    this.updateElapsedTime(scanData.startTime, scanData.endTime);
+                }
                 
                 if (scanData.status === 'completed') {
                     console.log('Scan completed, displaying results:', scanData.results);
                     clearInterval(this.scanInterval);
+                    
+                    // Clear elapsed timer
+                    if (this.elapsedTimer) {
+                        clearInterval(this.elapsedTimer);
+                    }
+                    
+                    // Update scan status to completed
+                    this.updateScanStatus('completed');
+                    
+                    // Update final elapsed time
+                    if (scanData.startTime && scanData.endTime) {
+                        this.updateElapsedTime(scanData.startTime, scanData.endTime);
+                    }
+                    
                     this.displayResults(scanData.results);
                     this.showNotification('Scan completed successfully', 'success');
                 } else if (scanData.status === 'failed') {
                     console.log('Scan failed:', scanData.error);
                     clearInterval(this.scanInterval);
+                    
+                    // Clear elapsed timer
+                    if (this.elapsedTimer) {
+                        clearInterval(this.elapsedTimer);
+                    }
+                    
+                    this.updateScanStatus('failed');
                     this.showNotification(`Scan failed: ${scanData.error}`, 'error');
                 }
             } else {
@@ -218,6 +265,38 @@ class DevXploitDashboard {
         
         if (progressText && phase) {
             progressText.textContent = phase;
+        }
+    }
+
+    updateElapsedTime(startTime, endTime = null) {
+        const elapsedElement = document.getElementById('elapsedTime');
+        if (!elapsedElement) return;
+
+        const start = new Date(startTime);
+        const end = endTime ? new Date(endTime) : new Date();
+        const elapsed = Math.floor((end - start) / 1000); // seconds
+        
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        elapsedElement.textContent = timeString;
+    }
+
+    updateScanStatus(status) {
+        // Update the scanning indicator in top right
+        const scanStatusBadge = document.getElementById('scanStatusBadge');
+        if (scanStatusBadge) {
+            if (status === 'completed') {
+                scanStatusBadge.className = 'inline-flex items-center gap-2 rounded-md px-2.5 py-1 text-xs ring-1 ring-inset ring-emerald-800 text-emerald-300';
+                scanStatusBadge.innerHTML = '<span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Completed';
+            } else if (status === 'failed') {
+                scanStatusBadge.className = 'inline-flex items-center gap-2 rounded-md px-2.5 py-1 text-xs ring-1 ring-inset ring-red-800 text-red-300';
+                scanStatusBadge.innerHTML = '<span class="h-1.5 w-1.5 rounded-full bg-red-500"></span> Failed';
+            } else if (status === 'scanning') {
+                scanStatusBadge.className = 'inline-flex items-center gap-2 rounded-md px-2.5 py-1 text-xs ring-1 ring-inset ring-zinc-800 text-zinc-300';
+                scanStatusBadge.innerHTML = '<span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span> Scanning';
+            }
         }
     }
 
@@ -242,6 +321,17 @@ class DevXploitDashboard {
         if (results.vulnerabilities && results.vulnerabilities.severity) {
             console.log('📊 Updating security score with:', results.vulnerabilities.severity);
             this.updateSecurityScore(results.vulnerabilities.severity);
+            
+            // Force chart update to show correct score
+            setTimeout(() => {
+                const scoreChart = window.scoreChart;
+                if (scoreChart) {
+                    const score = results.vulnerabilities.severity.score || 0;
+                    console.log('🔄 Force updating chart with score:', score);
+                    scoreChart.data.datasets[0].data = [score, 100 - score];
+                    scoreChart.update('active');
+                }
+            }, 500);
             
             // Add event to show score calculation
             const score = results.vulnerabilities.severity.score;
@@ -901,24 +991,42 @@ Strict-Transport-Security: max-age=31536000; includeSubDomains</code></pre>`
     updateSecurityScore(severity) {
         if (!severity) return;
 
+        console.log('🔄 Updating security score with severity data:', severity);
+
         // Update the main score display
         const scoreLabel = document.getElementById('scoreLabel');
         const scoreState = document.getElementById('scoreState');
         
         if (scoreLabel) {
-            scoreLabel.textContent = severity.score || 100;
+            scoreLabel.textContent = severity.score || 0;
+            console.log('📊 Updated score label to:', severity.score);
         }
         
         if (scoreState) {
-            scoreState.textContent = severity.grade || 'Excellent';
+            scoreState.textContent = severity.grade || 'Unknown';
+            console.log('📊 Updated score state to:', severity.grade);
         }
 
-        // Update the doughnut chart
+        // Update the doughnut chart with proper score calculation
         const scoreChart = window.scoreChart;
         if (scoreChart) {
-            const score = severity.score || 100;
-            scoreChart.data.datasets[0].data = [score, 100 - score];
-            scoreChart.update();
+            const score = Math.max(0, Math.min(100, severity.score || 0)); // Ensure score is between 0-100
+            const remaining = 100 - score;
+            
+            console.log('📈 Updating chart with score:', score, 'remaining:', remaining);
+            
+            scoreChart.data.datasets[0].data = [score, remaining];
+            
+            // Update chart colors based on score
+            if (score >= 80) {
+                scoreChart.data.datasets[0].backgroundColor = ['#10b981', '#374151']; // Green for good score
+            } else if (score >= 60) {
+                scoreChart.data.datasets[0].backgroundColor = ['#f59e0b', '#374151']; // Yellow for medium score
+            } else {
+                scoreChart.data.datasets[0].backgroundColor = ['#ef4444', '#374151']; // Red for poor score
+            }
+            
+            scoreChart.update('active');
         }
 
         // Update vulnerability counts in the sidebar
