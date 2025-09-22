@@ -1,0 +1,668 @@
+{
+  "scan_5wxfbf9dg_1758542752568": {
+    "id": "scan_5wxfbf9dg_1758542752568",
+    "url": "http://testphp.vulnweb.com",
+    "scanType": "basic",
+    "status": "completed",
+    "startTime": "2025-09-22T12:05:52.568Z",
+    "progress": 100,
+    "endTime": "2025-09-22T12:05:57.062Z",
+    "results": {
+      "url": "http://testphp.vulnweb.com",
+      "timestamp": "2025-09-22T12:05:52.570Z",
+      "vulnerabilities": [],
+      "securityHeaders": {
+        "strict-transport-security": "Missing",
+        "content-security-policy": "Missing",
+        "x-frame-options": "Missing",
+        "x-content-type-options": "Missing",
+        "x-xss-protection": "Missing"
+      },
+      "technicalInfo": {},
+      "error": "net::ERR_BLOCKED_BY_CLIENT at http://testphp.vulnweb.com"
+    },
+    "aiAnalysis": {
+      "redTeam": {
+        "attackNarrative": "Analyze the identified vulnerabilities to understand potential attack vectors. XSS vulnerabilities can be exploited for session hijacking, while SQL injection can lead to data breaches.",
+        "exploitChain": [
+          "Identify input vectors",
+          "Test for injection points",
+          "Escalate privileges",
+          "Extract sensitive data"
+        ],
+        "criticalPaths": [
+          "Review all user input fields",
+          "Check authentication mechanisms"
+        ]
+      },
+      "blueTeam": {
+        "defenseStrategy": "Implement comprehensive input validation, use parameterized queries, and deploy security headers across all endpoints.",
+        "prioritizedFixes": [
+          "Fix SQL injection vulnerabilities",
+          "Implement XSS protection",
+          "Add security headers",
+          "Enable HTTPS"
+        ],
+        "monitoringRecommendations": [
+          "Monitor for suspicious input patterns",
+          "Log authentication attempts",
+          "Track unusual database queries"
+        ]
+      }
+    }
+  },
+  "scan_gidykopm0_1758542938069": {
+    "id": "scan_gidykopm0_1758542938069",
+    "url": "http://testphp.vulnweb.com",
+    "scanType": "basic",
+    "status": "completed",
+    "startTime": "2025-09-22T12:08:58.070Z",
+    "progress": 100,
+    "endTime": "2025-09-22T12:09:02.272Z",
+    "results": {
+      "url": "http://testphp.vulnweb.com",
+      "timestamp": "2025-09-22T12:08:58.071Z",
+      "vulnerabilities": [
+        {
+          "type": "Form Input Risk",
+          "severity": "Medium",
+          "description": "Forms detected that may require security validation",
+          "evidence": "HTML forms found in response",
+          "recommendation": "Ensure all form inputs are properly validated and sanitized",
+          "cve": "CWE-20",
+          "impact": "Improper input validation could lead to various injection attacks"
+        },
+        {
+          "type": "Missing Security Header",
+          "severity": "High",
+          "description": "Missing strict-transport-security header",
+          "evidence": "Header 'strict-transport-security' not found in response",
+          "recommendation": "Implement strict-transport-security header for enhanced security",
+          "cve": "CWE-693",
+          "impact": "Reduced protection against various web attacks"
+        },
+        {
+          "type": "Missing Security Header",
+          "severity": "Medium",
+          "description": "Missing content-security-policy header",
+          "evidence": "Header 'content-security-policy' not found in response",
+          "recommendation": "Implement content-security-policy header for enhanced security",
+          "cve": "CWE-693",
+          "impact": "Reduced protection against various web attacks"
+        },
+        {
+          "type": "Missing Security Header",
+          "severity": "Medium",
+          "description": "Missing x-frame-options header",
+          "evidence": "Header 'x-frame-options' not found in response",
+          "recommendation": "Implement x-frame-options header for enhanced security",
+          "cve": "CWE-693",
+          "impact": "Reduced protection against various web attacks"
+        },
+        {
+          "type": "Missing Security Header",
+          "severity": "Medium",
+          "description": "Missing x-content-type-options header",
+          "evidence": "Header 'x-content-type-options' not found in response",
+          "recommendation": "Implement x-content-type-options header for enhanced security",
+          "cve": "CWE-693",
+          "impact": "Reduced protection against various web attacks"
+        },
+        {
+          "type": "Missing Security Header",
+          "severity": "Medium",
+          "description": "Missing x-xss-protection header",
+          "evidence": "Header 'x-xss-protection' not found in response",
+          "recommendation": "Implement x-xss-protection header for enhanced security",
+          "cve": "CWE-693",
+          "impact": "Reduced protection against various web attacks"
+        }
+      ],
+      "securityHeaders": {
+        "strict-transport-security": "Missing",
+        "content-security-policy": "Missing",
+        "x-frame-options": "Missing",
+        "x-content-type-options": "Missing",
+        "x-xss-protection": "Missing"
+      },
+      "technicalInfo": {
+        "responseTime": 1758542942271,
+        "statusCode": 200,
+        "server": "nginx/1.19.0",
+        "contentType": "text/html; charset=UTF-8",
+        "pageTitle": "Browser analysis blocked",
+        "note": "HTTP-only analysis performed due to client-side blocking"
+      }
+    },
+    "aiAnalysis": {
+      "redTeam": {
+        "attackNarrative": "Analyze the identified vulnerabilities to understand potential attack vectors. XSS vulnerabilities can be exploited for session hijacking, while SQL injection can lead to data breaches.",
+        "exploitChain": [
+          "Identify input vectors",
+          "Test for injection points",
+          "Escalate privileges",
+          "Extract sensitive data"
+        ],
+        "criticalPaths": [
+          "Review all user input fields",
+          "Check authentication mechanisms"
+        ]
+      },
+      "blueTeam": {
+        "defenseStrategy": "Implement comprehensive input validation, use parameterized queries, and deploy security headers across all endpoints.",
+        "prioritizedFixes": [
+          "Fix SQL injection vulnerabilities",
+          "Implement XSS protection",
+          "Add security headers",
+          "Enable HTTPS"
+        ],
+        "monitoringRecommendations": [
+          "Monitor for suspicious input patterns",
+          "Log authentication attempts",
+          "Track unusual database queries"
+        ]
+      }
+    }
+  },
+  "scan_slwa4p4gu_1758543191126": {
+    "id": "scan_slwa4p4gu_1758543191126",
+    "url": "http://testphp.vulnweb.com",
+    "scanType": "basic",
+    "status": "completed",
+    "startTime": "2025-09-22T12:13:11.127Z",
+    "progress": 100,
+    "endTime": "2025-09-22T12:13:15.266Z",
+    "results": {
+      "url": "http://testphp.vulnweb.com",
+      "timestamp": "2025-09-22T12:13:11.128Z",
+      "vulnerabilities": {
+        "vulnerabilities": [
+          {
+            "type": "XSS (Cross-Site Scripting)",
+            "severity": "High",
+            "description": "Multiple XSS vectors detected in HTTP response",
+            "evidence": "Found 3 potential XSS patterns including script tags, event handlers, and dangerous functions",
+            "recommendation": "Implement Content Security Policy, proper input validation and output encoding",
+            "cve": "CWE-79",
+            "impact": "Attackers could execute malicious scripts, steal cookies, or hijack sessions"
+          },
+          {
+            "type": "Form Security Risk",
+            "severity": "Medium",
+            "description": "1 forms with 2 input fields detected",
+            "evidence": "Forms analysis: 2 total inputs",
+            "recommendation": "Implement CSRF protection, input validation, secure transmission (HTTPS), and proper authentication",
+            "cve": "CWE-20",
+            "impact": "Various injection attacks and data manipulation possible"
+          },
+          {
+            "type": "Information Disclosure",
+            "severity": "Medium",
+            "description": "Sensitive information detected in HTTP response",
+            "evidence": "Comments, configuration details, or sensitive keywords found in response",
+            "recommendation": "Remove debug information, comments, and sensitive data from public responses",
+            "cve": "CWE-200",
+            "impact": "Information leakage may aid attackers in further exploitation"
+          },
+          {
+            "type": "Missing Security Header",
+            "severity": "High",
+            "description": "Missing strict-transport-security header",
+            "evidence": "Header 'strict-transport-security' not found in response",
+            "recommendation": "Implement strict-transport-security header for enhanced security",
+            "cve": "CWE-693",
+            "impact": "Reduced protection against various web attacks"
+          },
+          {
+            "type": "Missing Security Header",
+            "severity": "Medium",
+            "description": "Missing content-security-policy header",
+            "evidence": "Header 'content-security-policy' not found in response",
+            "recommendation": "Implement content-security-policy header for enhanced security",
+            "cve": "CWE-693",
+            "impact": "Reduced protection against various web attacks"
+          },
+          {
+            "type": "Missing Security Header",
+            "severity": "Medium",
+            "description": "Missing x-frame-options header",
+            "evidence": "Header 'x-frame-options' not found in response",
+            "recommendation": "Implement x-frame-options header for enhanced security",
+            "cve": "CWE-693",
+            "impact": "Reduced protection against various web attacks"
+          },
+          {
+            "type": "Missing Security Header",
+            "severity": "Medium",
+            "description": "Missing x-content-type-options header",
+            "evidence": "Header 'x-content-type-options' not found in response",
+            "recommendation": "Implement x-content-type-options header for enhanced security",
+            "cve": "CWE-693",
+            "impact": "Reduced protection against various web attacks"
+          },
+          {
+            "type": "Missing Security Header",
+            "severity": "Medium",
+            "description": "Missing x-xss-protection header",
+            "evidence": "Header 'x-xss-protection' not found in response",
+            "recommendation": "Implement x-xss-protection header for enhanced security",
+            "cve": "CWE-693",
+            "impact": "Reduced protection against various web attacks"
+          }
+        ],
+        "totalFound": 8,
+        "severity": {
+          "criticalCount": 0,
+          "highCount": 2,
+          "mediumCount": 6,
+          "lowCount": 0
+        }
+      },
+      "securityHeaders": {
+        "strict-transport-security": "Missing",
+        "content-security-policy": "Missing",
+        "x-frame-options": "Missing",
+        "x-content-type-options": "Missing",
+        "x-xss-protection": "Missing"
+      },
+      "technicalInfo": {
+        "responseTime": 1758543195265,
+        "statusCode": 200,
+        "server": "nginx/1.19.0",
+        "contentType": "text/html; charset=UTF-8",
+        "pageTitle": "Browser analysis blocked",
+        "note": "HTTP-only analysis performed due to client-side blocking"
+      }
+    },
+    "aiAnalysis": {
+      "redTeam": {
+        "attackNarrative": "Analyze the identified vulnerabilities to understand potential attack vectors. XSS vulnerabilities can be exploited for session hijacking, while SQL injection can lead to data breaches.",
+        "exploitChain": [
+          "Identify input vectors",
+          "Test for injection points",
+          "Escalate privileges",
+          "Extract sensitive data"
+        ],
+        "criticalPaths": [
+          "Review all user input fields",
+          "Check authentication mechanisms"
+        ]
+      },
+      "blueTeam": {
+        "defenseStrategy": "Implement comprehensive input validation, use parameterized queries, and deploy security headers across all endpoints.",
+        "prioritizedFixes": [
+          "Fix SQL injection vulnerabilities",
+          "Implement XSS protection",
+          "Add security headers",
+          "Enable HTTPS"
+        ],
+        "monitoringRecommendations": [
+          "Monitor for suspicious input patterns",
+          "Log authentication attempts",
+          "Track unusual database queries"
+        ]
+      }
+    }
+  },
+  "scan_yluloiqif_1758555369229": {
+    "id": "scan_yluloiqif_1758555369229",
+    "url": "http://testphp.vulnweb.com",
+    "scanType": "basic",
+    "status": "completed",
+    "startTime": "2025-09-22T15:36:09.230Z",
+    "progress": 100,
+    "endTime": "2025-09-22T15:36:13.427Z",
+    "results": {
+      "url": "http://testphp.vulnweb.com",
+      "timestamp": "2025-09-22T15:36:09.232Z",
+      "vulnerabilities": {
+        "vulnerabilities": [
+          {
+            "type": "XSS (Cross-Site Scripting)",
+            "severity": "High",
+            "description": "Multiple XSS vectors detected in HTTP response",
+            "evidence": "Found 3 potential XSS patterns including script tags, event handlers, and dangerous functions",
+            "recommendation": "Implement Content Security Policy, proper input validation and output encoding",
+            "cve": "CWE-79",
+            "impact": "Attackers could execute malicious scripts, steal cookies, or hijack sessions"
+          },
+          {
+            "type": "Form Security Risk",
+            "severity": "Medium",
+            "description": "1 forms with 2 input fields detected",
+            "evidence": "Forms analysis: 2 total inputs",
+            "recommendation": "Implement CSRF protection, input validation, secure transmission (HTTPS), and proper authentication",
+            "cve": "CWE-20",
+            "impact": "Various injection attacks and data manipulation possible"
+          },
+          {
+            "type": "Information Disclosure",
+            "severity": "Medium",
+            "description": "Sensitive information detected in HTTP response",
+            "evidence": "Comments, configuration details, or sensitive keywords found in response",
+            "recommendation": "Remove debug information, comments, and sensitive data from public responses",
+            "cve": "CWE-200",
+            "impact": "Information leakage may aid attackers in further exploitation"
+          },
+          {
+            "type": "Missing Security Header",
+            "severity": "High",
+            "description": "Missing strict-transport-security header",
+            "evidence": "Header 'strict-transport-security' not found in response",
+            "recommendation": "Implement strict-transport-security header for enhanced security",
+            "cve": "CWE-693",
+            "impact": "Reduced protection against various web attacks"
+          },
+          {
+            "type": "Missing Security Header",
+            "severity": "Medium",
+            "description": "Missing content-security-policy header",
+            "evidence": "Header 'content-security-policy' not found in response",
+            "recommendation": "Implement content-security-policy header for enhanced security",
+            "cve": "CWE-693",
+            "impact": "Reduced protection against various web attacks"
+          },
+          {
+            "type": "Missing Security Header",
+            "severity": "Medium",
+            "description": "Missing x-frame-options header",
+            "evidence": "Header 'x-frame-options' not found in response",
+            "recommendation": "Implement x-frame-options header for enhanced security",
+            "cve": "CWE-693",
+            "impact": "Reduced protection against various web attacks"
+          },
+          {
+            "type": "Missing Security Header",
+            "severity": "Medium",
+            "description": "Missing x-content-type-options header",
+            "evidence": "Header 'x-content-type-options' not found in response",
+            "recommendation": "Implement x-content-type-options header for enhanced security",
+            "cve": "CWE-693",
+            "impact": "Reduced protection against various web attacks"
+          },
+          {
+            "type": "Missing Security Header",
+            "severity": "Medium",
+            "description": "Missing x-xss-protection header",
+            "evidence": "Header 'x-xss-protection' not found in response",
+            "recommendation": "Implement x-xss-protection header for enhanced security",
+            "cve": "CWE-693",
+            "impact": "Reduced protection against various web attacks"
+          }
+        ],
+        "totalFound": 8,
+        "severity": {
+          "criticalCount": 0,
+          "highCount": 2,
+          "mediumCount": 6,
+          "lowCount": 0
+        }
+      },
+      "securityHeaders": {
+        "strict-transport-security": "Missing",
+        "content-security-policy": "Missing",
+        "x-frame-options": "Missing",
+        "x-content-type-options": "Missing",
+        "x-xss-protection": "Missing"
+      },
+      "technicalInfo": {
+        "responseTime": 1758555373424,
+        "statusCode": 200,
+        "server": "nginx/1.19.0",
+        "contentType": "text/html; charset=UTF-8",
+        "pageTitle": "Browser analysis blocked",
+        "note": "HTTP-only analysis performed due to client-side blocking"
+      }
+    },
+    "aiAnalysis": {
+      "redTeam": {
+        "attackNarrative": "Analyze the identified vulnerabilities to understand potential attack vectors. XSS vulnerabilities can be exploited for session hijacking, while SQL injection can lead to data breaches.",
+        "exploitChain": [
+          "Identify input vectors",
+          "Test for injection points",
+          "Escalate privileges",
+          "Extract sensitive data"
+        ],
+        "criticalPaths": [
+          "Review all user input fields",
+          "Check authentication mechanisms"
+        ]
+      },
+      "blueTeam": {
+        "defenseStrategy": "Implement comprehensive input validation, use parameterized queries, and deploy security headers across all endpoints.",
+        "prioritizedFixes": [
+          "Fix SQL injection vulnerabilities",
+          "Implement XSS protection",
+          "Add security headers",
+          "Enable HTTPS"
+        ],
+        "monitoringRecommendations": [
+          "Monitor for suspicious input patterns",
+          "Log authentication attempts",
+          "Track unusual database queries"
+        ]
+      }
+    }
+  },
+  "scan_4jfkv80t8_1758555678746": {
+    "id": "scan_4jfkv80t8_1758555678746",
+    "url": "http://testphp.vulnweb.com",
+    "scanType": "comprehensive",
+    "status": "running",
+    "startTime": "2025-09-22T15:41:18.746Z",
+    "progress": 50,
+    "currentStep": "Starting ZAP active scan"
+  },
+  "scan_9865j3b0v_1758555862987": {
+    "id": "scan_9865j3b0v_1758555862987",
+    "url": "http://testphp.vulnweb.com/artists.php?artist=1",
+    "scanType": "comprehensive",
+    "status": "completed",
+    "startTime": "2025-09-22T15:44:22.987Z",
+    "progress": 100,
+    "endTime": "2025-09-22T15:45:37.389Z",
+    "results": {
+      "url": "http://testphp.vulnweb.com/artists.php?artist=1",
+      "timestamp": "2025-09-22T15:44:22.989Z",
+      "vulnerabilities": {
+        "vulnerabilities": [
+          {
+            "type": "XSS (Cross-Site Scripting)",
+            "severity": "High",
+            "description": "Multiple XSS vectors detected in HTTP response",
+            "evidence": "Found 4 potential XSS patterns including script tags, event handlers, and dangerous functions",
+            "recommendation": "Implement Content Security Policy, proper input validation and output encoding",
+            "cve": "CWE-79",
+            "impact": "Attackers could execute malicious scripts, steal cookies, or hijack sessions"
+          },
+          {
+            "type": "Form Security Risk",
+            "severity": "Medium",
+            "description": "1 forms with 2 input fields detected",
+            "evidence": "Forms analysis: 2 total inputs",
+            "recommendation": "Implement CSRF protection, input validation, secure transmission (HTTPS), and proper authentication",
+            "cve": "CWE-20",
+            "impact": "Various injection attacks and data manipulation possible"
+          },
+          {
+            "type": "Information Disclosure",
+            "severity": "Medium",
+            "description": "Sensitive information detected in HTTP response",
+            "evidence": "Comments, configuration details, or sensitive keywords found in response",
+            "recommendation": "Remove debug information, comments, and sensitive data from public responses",
+            "cve": "CWE-200",
+            "impact": "Information leakage may aid attackers in further exploitation"
+          },
+          {
+            "type": "Missing Security Header",
+            "severity": "High",
+            "description": "Missing strict-transport-security header",
+            "evidence": "Header 'strict-transport-security' not found in response",
+            "recommendation": "Implement strict-transport-security header for enhanced security",
+            "cve": "CWE-693",
+            "impact": "Reduced protection against various web attacks"
+          },
+          {
+            "type": "Missing Security Header",
+            "severity": "Medium",
+            "description": "Missing content-security-policy header",
+            "evidence": "Header 'content-security-policy' not found in response",
+            "recommendation": "Implement content-security-policy header for enhanced security",
+            "cve": "CWE-693",
+            "impact": "Reduced protection against various web attacks"
+          },
+          {
+            "type": "Missing Security Header",
+            "severity": "Medium",
+            "description": "Missing x-frame-options header",
+            "evidence": "Header 'x-frame-options' not found in response",
+            "recommendation": "Implement x-frame-options header for enhanced security",
+            "cve": "CWE-693",
+            "impact": "Reduced protection against various web attacks"
+          },
+          {
+            "type": "Missing Security Header",
+            "severity": "Medium",
+            "description": "Missing x-content-type-options header",
+            "evidence": "Header 'x-content-type-options' not found in response",
+            "recommendation": "Implement x-content-type-options header for enhanced security",
+            "cve": "CWE-693",
+            "impact": "Reduced protection against various web attacks"
+          },
+          {
+            "type": "Missing Security Header",
+            "severity": "Medium",
+            "description": "Missing x-xss-protection header",
+            "evidence": "Header 'x-xss-protection' not found in response",
+            "recommendation": "Implement x-xss-protection header for enhanced security",
+            "cve": "CWE-693",
+            "impact": "Reduced protection against various web attacks"
+          },
+          {
+            "type": "Missing Anti-clickjacking Header (ZAP)",
+            "severity": "High",
+            "description": "The response does not protect against 'ClickJacking' attacks. It should include either Content-Security-Policy with 'frame-ancestors' directive or X-Frame-Options.",
+            "evidence": "Instance: http://testphp.vulnweb.com/artists.php?artist=1",
+            "recommendation": "Modern Web browsers support the Content-Security-Policy and X-Frame-Options HTTP headers. Ensure one of them is set on all web pages returned by your site/app.\nIf you expect the page to be framed only by pages on your server (e.g. it's part of a FRAMESET) then you'll want to use SAMEORIGIN, otherwise if you never expect the page to be framed, you should use DENY. Alternatively consider implementing Content Security Policy's \"frame-ancestors\" directive.",
+            "cve": "CWE-1021",
+            "impact": "The response does not protect against 'ClickJacking' attacks. It should include either Content-Security-Policy with 'frame-ancestors' directive or X-Frame-Options."
+          },
+          {
+            "type": "Charset Mismatch (Header Versus Meta Content-Type Charset) (ZAP)",
+            "severity": "Low",
+            "description": "This check identifies responses where the HTTP Content-Type header declares a charset different from the charset defined by the body of the HTML or XML. When there's a charset mismatch between the HTTP header and content body Web browsers can be forced into an undesirable content-sniffing mode to determine the content's correct character set.\n\nAn attacker could manipulate content on the page to be interpreted in an encoding of their choice. For example, if an attacker can control content at the beginning of the page, they could inject script using UTF-7 encoded text and manipulate some browsers into interpreting that text.",
+            "evidence": "Instance: http://testphp.vulnweb.com/artists.php?artist=1",
+            "recommendation": "Force UTF-8 for all text content in both the HTTP header and meta tags in HTML or encoding declarations in XML.",
+            "cve": "CWE-436",
+            "impact": "This check identifies responses where the HTTP Content-Type header declares a charset different from the charset defined by the body of the HTML or XML. When there's a charset mismatch between the HTTP header and content body Web browsers can be forced into an undesirable content-sniffing mode to determine the content's correct character set.\n\nAn attacker could manipulate content on the page to be interpreted in an encoding of their choice. For example, if an attacker can control content at the beginning of the page, they could inject script using UTF-7 encoded text and manipulate some browsers into interpreting that text."
+          },
+          {
+            "type": "Content Security Policy (CSP) Header Not Set (ZAP)",
+            "severity": "High",
+            "description": "Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.",
+            "evidence": "Instance: http://testphp.vulnweb.com/artists.php?artist=1",
+            "recommendation": "Ensure that your web server, application server, load balancer, etc. is configured to set the Content-Security-Policy header.",
+            "cve": "CWE-693",
+            "impact": "Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files."
+          },
+          {
+            "type": "Absence of Anti-CSRF Tokens (ZAP)",
+            "severity": "High",
+            "description": "No Anti-CSRF tokens were found in a HTML submission form.\nA cross-site request forgery is an attack that involves forcing a victim to send an HTTP request to a target destination without their knowledge or intent in order to perform an action as the victim. The underlying cause is application functionality using predictable URL/form actions in a repeatable way. The nature of the attack is that CSRF exploits the trust that a web site has for a user. By contrast, cross-site scripting (XSS) exploits the trust that a user has for a web site. Like XSS, CSRF attacks are not necessarily cross-site, but they can be. Cross-site request forgery is also known as CSRF, XSRF, one-click attack, session riding, confused deputy, and sea surf.\n\nCSRF attacks are effective in a number of situations, including:\n    * The victim has an active session on the target site.\n    * The victim is authenticated via HTTP auth on the target site.\n    * The victim is on the same local network as the target site.\n\nCSRF has primarily been used to perform an action against a target site using the victim's privileges, but recent techniques have been discovered to disclose information by gaining access to the response. The risk of information disclosure is dramatically increased when the target site is vulnerable to XSS, because XSS can be used as a platform for CSRF, allowing the attack to operate within the bounds of the same-origin policy.",
+            "evidence": "Instance: http://testphp.vulnweb.com/artists.php?artist=1",
+            "recommendation": "Phase: Architecture and Design\nUse a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid.\nFor example, use anti-CSRF packages such as the OWASP CSRFGuard.\n\nPhase: Implementation\nEnsure that your application is free of cross-site scripting issues, because most CSRF defenses can be bypassed using attacker-controlled script.\n\nPhase: Architecture and Design\nGenerate a unique nonce for each form, place the nonce into the form, and verify the nonce upon receipt of the form. Be sure that the nonce is not predictable (CWE-330).\nNote that this can be bypassed using XSS.\n\nIdentify especially dangerous operations. When the user performs a dangerous operation, send a separate confirmation request to ensure that the user intended to perform that operation.\nNote that this can be bypassed using XSS.\n\nUse the ESAPI Session Management control.\nThis control includes a component for CSRF.\n\nDo not use the GET method for any request that triggers a state change.\n\nPhase: Implementation\nCheck the HTTP Referer header to see if the request originated from an expected page. This could break legitimate functionality, because users or proxies may have disabled sending the Referer for privacy reasons.",
+            "cve": "CWE-352",
+            "impact": "No Anti-CSRF tokens were found in a HTML submission form.\nA cross-site request forgery is an attack that involves forcing a victim to send an HTTP request to a target destination without their knowledge or intent in order to perform an action as the victim. The underlying cause is application functionality using predictable URL/form actions in a repeatable way. The nature of the attack is that CSRF exploits the trust that a web site has for a user. By contrast, cross-site scripting (XSS) exploits the trust that a user has for a web site. Like XSS, CSRF attacks are not necessarily cross-site, but they can be. Cross-site request forgery is also known as CSRF, XSRF, one-click attack, session riding, confused deputy, and sea surf.\n\nCSRF attacks are effective in a number of situations, including:\n    * The victim has an active session on the target site.\n    * The victim is authenticated via HTTP auth on the target site.\n    * The victim is on the same local network as the target site.\n\nCSRF has primarily been used to perform an action against a target site using the victim's privileges, but recent techniques have been discovered to disclose information by gaining access to the response. The risk of information disclosure is dramatically increased when the target site is vulnerable to XSS, because XSS can be used as a platform for CSRF, allowing the attack to operate within the bounds of the same-origin policy."
+          },
+          {
+            "type": "Modern Web Application (ZAP)",
+            "severity": "Low",
+            "description": "The application appears to be a modern web application. If you need to explore it automatically then the Ajax Spider may well be more effective than the standard one.",
+            "evidence": "Instance: http://testphp.vulnweb.com/artists.php?artist=1",
+            "recommendation": "This is an informational alert and so no changes are required.",
+            "cve": "CWE--1",
+            "impact": "The application appears to be a modern web application. If you need to explore it automatically then the Ajax Spider may well be more effective than the standard one."
+          },
+          {
+            "type": "Server Leaks Version Information via \"Server\" HTTP Response Header Field (ZAP)",
+            "severity": "Medium",
+            "description": "The web/application server is leaking version information via the \"Server\" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.",
+            "evidence": "Instance: http://testphp.vulnweb.com/artists.php?artist=1",
+            "recommendation": "Ensure that your web server, application server, load balancer, etc. is configured to suppress the \"Server\" header or provide generic details.",
+            "cve": "CWE-497",
+            "impact": "The web/application server is leaking version information via the \"Server\" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to."
+          },
+          {
+            "type": "X-Content-Type-Options Header Missing (ZAP)",
+            "severity": "Medium",
+            "description": "The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.",
+            "evidence": "Instance: http://testphp.vulnweb.com/artists.php?artist=1",
+            "recommendation": "Ensure that the application/web server sets the Content-Type header appropriately, and that it sets the X-Content-Type-Options header to 'nosniff' for all web pages.\nIf possible, ensure that the end user uses a standards-compliant and modern web browser that does not perform MIME-sniffing at all, or that can be directed by the web application/web server to not perform MIME-sniffing.",
+            "cve": "CWE-693",
+            "impact": "The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing."
+          },
+          {
+            "type": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s) (ZAP)",
+            "severity": "Medium",
+            "description": "The web/application server is leaking information via one or more \"X-Powered-By\" HTTP response headers. Access to such information may facilitate attackers identifying other frameworks/components your web application is reliant upon and the vulnerabilities such components may be subject to.",
+            "evidence": "Instance: http://testphp.vulnweb.com/artists.php?artist=1",
+            "recommendation": "Ensure that your web server, application server, load balancer, etc. is configured to suppress \"X-Powered-By\" headers.",
+            "cve": "CWE-497",
+            "impact": "The web/application server is leaking information via one or more \"X-Powered-By\" HTTP response headers. Access to such information may facilitate attackers identifying other frameworks/components your web application is reliant upon and the vulnerabilities such components may be subject to."
+          }
+        ],
+        "totalFound": 16,
+        "severity": {
+          "criticalCount": 0,
+          "highCount": 5,
+          "mediumCount": 9,
+          "lowCount": 2
+        }
+      },
+      "securityHeaders": {
+        "strict-transport-security": "Missing",
+        "content-security-policy": "Missing",
+        "x-frame-options": "Missing",
+        "x-content-type-options": "Missing",
+        "x-xss-protection": "Missing"
+      },
+      "technicalInfo": {
+        "responseTime": 1758555867032,
+        "statusCode": 200,
+        "server": "nginx/1.19.0",
+        "contentType": "text/html; charset=UTF-8",
+        "pageTitle": "Browser analysis blocked",
+        "note": "HTTP-only analysis performed due to client-side blocking"
+      }
+    },
+    "aiAnalysis": {
+      "redTeam": {
+        "attackNarrative": "Analyze the identified vulnerabilities to understand potential attack vectors. XSS vulnerabilities can be exploited for session hijacking, while SQL injection can lead to data breaches.",
+        "exploitChain": [
+          "Identify input vectors",
+          "Test for injection points",
+          "Escalate privileges",
+          "Extract sensitive data"
+        ],
+        "criticalPaths": [
+          "Review all user input fields",
+          "Check authentication mechanisms"
+        ]
+      },
+      "blueTeam": {
+        "defenseStrategy": "Implement comprehensive input validation, use parameterized queries, and deploy security headers across all endpoints.",
+        "prioritizedFixes": [
+          "Fix SQL injection vulnerabilities",
+          "Implement XSS protection",
+          "Add security headers",
+          "Enable HTTPS"
+        ],
+        "monitoringRecommendations": [
+          "Monitor for suspicious input patterns",
+          "Log authentication attempts",
+          "Track unusual database queries"
+        ]
+      }
+    }
+  }
+}

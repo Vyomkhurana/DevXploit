@@ -3,7 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DevXploit — Simplified Security Intelligence</title>
+    <title>Dev                      <div class="rounded-lg border border-zinc-800 bg-zinc-950/60 px-4 py-4">
+                        <div class="flex items-center justify-between">
+                          <p class="text-sm">Security Score</p>
+                          <span class="text-xs text-zinc-500">Out of 100</span>
+                        </div>
+                        <div class="mt-3">
+                          <div class="relative h-2.5 w-full rounded-full bg-zinc-800 overflow-hidden">
+                            <div id="securityScoreBar" class="h-full w-0 bg-zinc-500/80 transition-all"></div>
+                          </div>
+                          <div id="securityScore" class="mt-2 text-xs text-zinc-400">Awaiting scan results</div>
+                        </div>
+                      </div>plified Security Intelligence</title>
     <meta name="theme-color" content="#0a0a0b" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -118,6 +129,9 @@
                     <span class="text-xs text-zinc-300">Actionable developer output</span>
                   </div>
                 </div>
+
+                <!-- ZAP Integration Status (populated by JavaScript) -->
+                <div id="zapInfo"></div>
               </div>
 
               <!-- Right Visual Panel -->
@@ -318,8 +332,8 @@
                 <div class="rounded-xl border border-zinc-800 bg-zinc-900/40">
                   <div class="px-5 py-4 border-b border-zinc-800 flex items-center justify-between">
                     <div>
-                      <h2 class="text-xl font-semibold tracking-tight">Detailed Findings</h2>
-                      <p class="text-sm text-zinc-400">Expand items to see narratives and remediation steps.</p>
+                      <h2 class="text-xl font-semibold tracking-tight">Security Analysis</h2>
+                      <p class="text-sm text-zinc-400">Switch between attacker and defender perspectives.</p>
                     </div>
                     <div class="flex items-center gap-2">
                       <button id="filterCritical" class="hidden sm:inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs ring-1 ring-zinc-800 text-zinc-300 hover:bg-zinc-800/50 transition">
@@ -331,8 +345,77 @@
                     </div>
                   </div>
 
+                  <!-- Red Team / Blue Team Tabs -->
+                  <div class="px-5 py-3 border-b border-zinc-800">
+                    <div class="flex items-center gap-1 bg-zinc-950/60 rounded-lg p-1 w-fit">
+                      <button id="redTeamTab" class="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition bg-red-500/10 text-red-400 ring-1 ring-red-500/20">
+                        <i data-lucide="zap" class="h-4 w-4" style="stroke-width:1.5"></i>
+                        Red Team
+                        <span class="ml-1 text-xs bg-red-500/20 text-red-300 px-1.5 py-0.5 rounded">Attacker</span>
+                      </button>
+                      <button id="blueTeamTab" class="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition text-zinc-400 hover:text-zinc-300 hover:bg-zinc-800/50">
+                        <i data-lucide="shield-check" class="h-4 w-4" style="stroke-width:1.5"></i>
+                        Blue Team
+                        <span class="ml-1 text-xs bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded">Defender</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Vulnerability Findings -->
                   <div id="findingsList" class="divide-y divide-zinc-800">
                     <!-- Items appended via JS -->
+                  </div>
+
+                  <!-- AI Analysis Section -->
+                  <div id="aiAnalysisSection" class="border-t border-zinc-800" style="display: none;">
+                    <div class="px-5 py-4">
+                      <div class="flex items-center gap-2 mb-4">
+                        <i data-lucide="brain" class="h-5 w-5 text-purple-400" style="stroke-width:1.5"></i>
+                        <h3 class="text-lg font-semibold">AI Security Analysis</h3>
+                        <span class="inline-flex items-center gap-1 text-xs bg-purple-500/10 text-purple-400 px-2 py-1 rounded-md ring-1 ring-purple-500/20">
+                          <i data-lucide="sparkles" class="h-3 w-3" style="stroke-width:1.5"></i>
+                          Powered by GPT-4
+                        </span>
+                      </div>
+                      
+                      <!-- Red Team Content -->
+                      <div id="redTeamContent" class="space-y-4">
+                        <div class="rounded-lg border border-red-500/20 bg-red-500/5 p-4">
+                          <div class="flex items-start gap-3">
+                            <div class="flex-shrink-0">
+                              <div class="flex items-center justify-center h-8 w-8 rounded-lg bg-red-500/10 ring-1 ring-red-500/20">
+                                <i data-lucide="crosshair" class="h-4 w-4 text-red-400" style="stroke-width:1.5"></i>
+                              </div>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                              <h4 class="text-sm font-semibold text-red-400 mb-2">Attack Scenario</h4>
+                              <div id="attackerNarrative" class="text-sm text-zinc-300 leading-relaxed prose prose-invert prose-sm max-w-none">
+                                <p class="text-zinc-400 italic">AI analysis will appear here after scan completion...</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Blue Team Content -->
+                      <div id="blueTeamContent" class="space-y-4" style="display: none;">
+                        <div class="rounded-lg border border-blue-500/20 bg-blue-500/5 p-4">
+                          <div class="flex items-start gap-3">
+                            <div class="flex-shrink-0">
+                              <div class="flex items-center justify-center h-8 w-8 rounded-lg bg-blue-500/10 ring-1 ring-blue-500/20">
+                                <i data-lucide="shield" class="h-4 w-4 text-blue-400" style="stroke-width:1.5"></i>
+                              </div>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                              <h4 class="text-sm font-semibold text-blue-400 mb-2">Defense Strategy</h4>
+                              <div id="defenseRemediation" class="text-sm text-zinc-300 leading-relaxed prose prose-invert prose-sm max-w-none">
+                                <p class="text-zinc-400 italic">Remediation guidance will appear here after scan completion...</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -680,75 +763,7 @@
         });
       }
 
-      // Demo vulnerabilities stream
-      const demoFindings = [
-        {
-          at: 18,
-          phase: 'vuln',
-          severity: 'High',
-          name: 'Reflected XSS',
-          location: 'GET /search?q=',
-          narrative: '1. Victim clicks a crafted link\n2. Query parameter injects script into response\n3. Script executes in user context, stealing session',
-          remediation: 'Sanitize and encode user-controlled input before reflection.',
-          code: `// Example fix (Express.js)
-app.get('/search', (req, res) => {
-  const q = req.query.q || '';
-  const safe = escapeHtml(q); // encode < > " ' &
-  res.render('search', { q: safe });
-});`
-        },
-        {
-          at: 30,
-          phase: 'vuln',
-          severity: 'Critical',
-          name: 'SQL Injection',
-          location: 'POST /auth/login [username]',
-          narrative: '1. Attacker submits payload \' OR 1=1 --\n2. Query concatenation bypasses auth\n3. Potential data extraction via UNION SELECT',
-          remediation: 'Use parameterized queries and least-privilege DB roles.',
-          code: `-- Insecure
-sql = "SELECT * FROM users WHERE username='" + user + "' AND pass='" + pass + "'";
-
--- Secure (PostgreSQL)
-SELECT * FROM users WHERE username=$1 AND pass=crypt($2, pass);`
-        },
-        {
-          at: 42,
-          phase: 'exploit',
-          severity: 'Medium',
-          name: 'Open Redirect',
-          location: 'GET /redirect?url=',
-          narrative: '1. Phishing link abuses redirect endpoint\n2. Victim trusts domain and is redirected to malicious site',
-          remediation: 'Implement allowlist of redirect targets; reject external domains.',
-          code: `const allow = new Set(['https://app.example.com']);
-const url = new URL(req.query.url, 'https://app.example.com');
-if (!allow.has(url.origin)) return res.status(400).send('Invalid target');
-res.redirect(url.href);`
-        },
-        {
-          at: 56,
-          phase: 'vuln',
-          severity: 'Low',
-          name: 'Clickjacking',
-          location: 'Missing X-Frame-Options / CSP frame-ancestors',
-          narrative: '1. Page can be embedded in a malicious iframe\n2. Attacker overlays UI to trick clicks',
-          remediation: 'Send X-Frame-Options: DENY or configure frame-ancestors in CSP.',
-          code: `// Example (Node/helmet)
-app.use(helmet.frameguard({ action: 'deny' }));
-// Or CSP
-Content-Security-Policy: frame-ancestors 'none';`
-        },
-        {
-          at: 68,
-          phase: 'post',
-          severity: 'Info',
-          name: 'Server Banner Exposed',
-          location: 'Response header: Server: nginx/1.18',
-          narrative: '1. Version disclosure aids targeting known exploits.',
-          remediation: 'Hide or generalize server banner.',
-          code: `# nginx
-server_tokens off;`
-        },
-      ];
+      // Removed demo findings - using real scan results only
 
       function severityColorClass(sev) {
         return {
@@ -806,42 +821,10 @@ server_tokens off;`
         });
       }
 
-      // Scan flow simulation
+      // Real scan flow - no simulation
       function runScanFlow() {
-        let t = 0;
-        const total = 75; // seconds simulated
-        scanInterval = setInterval(() => {
-          t++;
-          const pct = Math.min(100, Math.round((t / total) * 100));
-          progressBar.style.width = pct + '%';
-          progressText.textContent = pct < 100 ? `Scanning... ${pct}%` : 'Finalizing...';
-
-          // Phase transitions
-          if (t === 5) { setPhase('recon'); glowNode('recon','stroke-sky-500/60'); pushEvent('radar','text-sky-400', 'Reconnaissance started: headers, robots, SSL, tech stack.'); }
-          if (t === 15) { setPhase('enum'); glowNode('enum','stroke-sky-500/60'); pushEvent('list-tree','text-sky-400', 'Enumerating endpoints and parameters.'); }
-          if (t === 25) { setPhase('vuln'); glowNode('vuln','stroke-amber-500/60'); pushEvent('beaker','text-amber-400', 'Running vulnerability checks.'); }
-          if (t === 45) { setPhase('exploit'); glowNode('exploit','stroke-red-500/60'); pushEvent('zap','text-red-400', 'Validating critical findings (safe PoC).'); }
-          if (t === 65) { setPhase('post'); glowNode('post','stroke-emerald-500/60'); pushEvent('key-round','text-emerald-400', 'Assessing impact and exposure.'); }
-
-          // Stream findings
-          demoFindings.forEach(f => {
-            if (f.at === t) {
-              counts[f.severity]++;
-              updateCounts();
-              updateScore(severityWeights[f.severity]);
-              renderFindingCard(f);
-              pushEvent(
-                f.severity === 'Critical' ? 'alert-octagon' : 'alert-triangle',
-                severityColorClass(f.severity),
-                `${f.severity} — ${f.name} at ${f.location}`
-              );
-            }
-          });
-
-          if (pct >= 100) {
-            finalizeScan();
-          }
-        }, 1000);
+        // Real scanning is handled by the DevXploitDashboard class
+        // This function is kept for compatibility but does nothing
       }
 
       function validateUrl(url) {
@@ -864,58 +847,8 @@ server_tokens off;`
         Array.from(findingsList.children).forEach(el => el.style.display = '');
       });
 
-      // Scan button handler
-      scanBtn.addEventListener('click', () => {
-        const url = targetInput.value.trim() || 'https://example.com';
-        if (!validateUrl(url)) {
-          document.getElementById('urlHint').textContent = 'Invalid URL. Please include http:// or https://';
-          document.getElementById('urlHint').classList.remove('text-zinc-500');
-          document.getElementById('urlHint').classList.add('text-red-400');
-          return;
-        }
-
-        // Reset state
-        findingsList.innerHTML = '';
-        eventsFeed.innerHTML = '';
-        counts.Critical = counts.High = counts.Medium = counts.Low = counts.Info = 0;
-        updateCounts();
-        currentScore = 100;
-        scoreLabel.textContent = '100';
-        scoreState.textContent = 'Excellent';
-        if (scoreChart) {
-          scoreChart.data.datasets[0].data = [100, 0];
-          scoreChart.update();
-        }
-
-        // Transition
-        preScanState.classList.remove('hidden');
-        scanBtn.disabled = true;
-        scanBtn.classList.add('opacity-80','cursor-not-allowed');
-        setTimeout(() => {
-          homeView.classList.add('hidden');
-          dashboardView.classList.remove('hidden');
-          targetDisplay.textContent = url;
-          progressBar.style.width = '0%';
-          progressText.textContent = 'Initializing...';
-          scanStatusBadge.innerHTML = '<span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span> Scanning';
-          // Reset glow
-          killChainSvg.querySelectorAll('g[data-phase] circle:nth-child(2)').forEach(c => {
-            c.classList.remove('stroke-sky-500/60','stroke-amber-500/60','stroke-red-500/60','stroke-emerald-500/60');
-            c.classList.add('stroke-sky-500/0','stroke-amber-500/0','stroke-red-500/0','stroke-emerald-500/0');
-          });
-
-          // Mode
-          const active = activeScanToggle.checked;
-          modeBadge.innerHTML = active
-            ? '<span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span> Active'
-            : '<span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span> Passive';
-          pushEvent('play-circle','text-sky-400', `Scan started for ${url} (${active ? 'Active' : 'Passive'})`);
-
-          initScoreChart();
-          runScanFlow();
-          startTimer();
-        }, 900);
-      });
+      // Scan button handler - removed, now handled by DevXploitDashboard class
+      // The scan functionality is implemented in /public/dashboard.js
 
       // Initialize chart container once visible
       const onVisible = new IntersectionObserver((entries) => {
@@ -927,5 +860,8 @@ server_tokens off;`
       });
       onVisible.observe(document.getElementById('dashboardView'));
     </script>
+    
+    <!-- DevXploit Dashboard JavaScript -->
+    <script src="/dashboard.js"></script>
   </body>
 </html>
