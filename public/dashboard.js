@@ -449,41 +449,43 @@ class DevXploitDashboard {
         };
 
         const config = severityConfig[vuln.severity] || severityConfig['Info'];
-
-        // Generate team-specific content
-        const perspectiveContent = isRedTeam ? 
-            this.generateRedTeamPerspective(vuln) : 
-            this.generateBlueTeamPerspective(vuln);
+        const accordionId = `accordion-${index}`;
 
         return `
-            <div class="p-5 hover:bg-zinc-900/30 transition-colors border-l-2 ${isRedTeam ? 'border-red-500/30' : 'border-blue-500/30'}">
-                <div class="flex items-start gap-4">
-                    <!-- Severity Indicator -->
-                    <div class="flex-shrink-0">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-lg ${config.bgClass} border">
-                            <i data-lucide="${config.icon}" class="w-5 h-5 ${config.color.split(' ')[0]}" style="stroke-width:1.5"></i>
-                        </div>
-                    </div>
-
-                    <!-- Vulnerability Details -->
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-start justify-between mb-2">
-                            <h3 class="text-base font-semibold text-zinc-200 leading-tight">${vuln.type}</h3>
-                            <div class="flex items-center gap-2">
-                                <span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md border ${config.color}">
-                                    ${vuln.severity}
-                                </span>
-                                <span class="inline-flex items-center px-2 py-1 text-xs rounded-md ${isRedTeam ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'}">
-                                    <i data-lucide="${isRedTeam ? 'sword' : 'shield'}" class="w-3 h-3 mr-1" style="stroke-width:1.5"></i>
-                                    ${isRedTeam ? 'Attacker' : 'Defender'}
-                                </span>
+            <div class="border border-zinc-800 rounded-lg overflow-hidden mb-4">
+                <!-- Accordion Header -->
+                <button class="w-full p-4 text-left hover:bg-zinc-900/30 transition-colors border-l-4 ${isRedTeam ? 'border-red-500/50' : 'border-blue-500/50'}" 
+                        onclick="toggleAccordion('${accordionId}')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-lg ${config.bgClass} border">
+                                <i data-lucide="${config.icon}" class="w-5 h-5 ${config.color.split(' ')[0]}" style="stroke-width:1.5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-semibold text-zinc-200 leading-tight">${vuln.type}</h3>
+                                <p class="text-sm text-zinc-400 mt-1">${this.getLaymanExplanation(vuln)}</p>
                             </div>
                         </div>
-                        
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md border ${config.color}">
+                                ${vuln.severity}
+                            </span>
+                            <span class="inline-flex items-center px-2 py-1 text-xs rounded-md ${isRedTeam ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'}">
+                                <i data-lucide="${isRedTeam ? 'sword' : 'shield'}" class="w-3 h-3 mr-1" style="stroke-width:1.5"></i>
+                                ${isRedTeam ? 'Attacker' : 'Defender'}
+                            </span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-400 transition-transform duration-200" id="${accordionId}-chevron" style="stroke-width:1.5"></i>
+                        </div>
+                    </div>
+                </button>
+
+                <!-- Accordion Content -->
+                <div id="${accordionId}" class="hidden border-t border-zinc-800">
+                    <div class="p-5">
                         <p class="text-sm text-zinc-400 mb-4 leading-relaxed">${vuln.description}</p>
                         
                         <!-- Team-Specific Perspective -->
-                        ${perspectiveContent}
+                        ${isRedTeam ? this.generateRedTeamPerspective(vuln) : this.generateBlueTeamPerspective(vuln)}
                         
                         <!-- Technical Details -->
                         <div class="space-y-3 mt-4">
@@ -508,6 +510,24 @@ class DevXploitDashboard {
                 </div>
             </div>
         `;
+    }
+
+    getLaymanExplanation(vuln) {
+        const vulnType = vuln.type.toLowerCase();
+        
+        if (vulnType.includes('xss') || vulnType.includes('cross-site scripting')) {
+            return "Malicious code can be injected to steal user data or hijack accounts";
+        } else if (vulnType.includes('sql injection')) {
+            return "Attackers can access, steal, or manipulate database information";
+        } else if (vulnType.includes('missing') && vulnType.includes('header')) {
+            return "Website lacks important security protections against attacks";
+        } else if (vulnType.includes('form') && vulnType.includes('security')) {
+            return "Web forms can be manipulated to perform unauthorized actions";
+        } else if (vulnType.includes('information disclosure')) {
+            return "Sensitive information is exposed that could help attackers";
+        } else {
+            return "Security weakness that could be exploited by attackers";
+        }
     }
 
     generateRedTeamPerspective(vuln) {
@@ -538,7 +558,9 @@ class DevXploitDashboard {
         
         // Generate specific plans based on vulnerability type and context
         if (vulnType.includes('xss') || vulnType.includes('cross-site scripting')) {
-            return `Attacker Plan for XSS at ${location}:
+            return `What this means in simple terms: This is like someone being able to put a fake ATM keypad over a real one to steal your PIN. The website allows malicious code to run in your browser.
+
+Attacker Plan for XSS at ${location}:
 
 1. Target Discovery: The attacker notices this XSS vulnerability in the web form or parameter. Like a thief finding an unlocked window, they see an entry point into user sessions.
 
@@ -554,7 +576,9 @@ Real-world example: In 2018, British Airways suffered an XSS attack where attack
         }
         
         if (vulnType.includes('sql injection')) {
-            return `Attacker Plan for SQL Injection at ${location}:
+            return `What this means in simple terms: This is like being able to whisper instructions to a bank teller that makes them give you access to anyone's account. The website doesn't properly check what you're asking for from the database.
+
+Attacker Plan for SQL Injection at ${location}:
 
 1. Database Probing: The attacker tests input fields with special characters like single quotes to see if they get database errors. Think of it like trying different keys to see which one opens a lock.
 
@@ -571,7 +595,9 @@ Real-world example: The 2017 Equifax breach exposed 147 million people's data th
         
         if (vulnType.includes('missing') && vulnType.includes('header')) {
             const headerName = evidence.match(/Header '([^']+)'/)?.[1] || 'security header';
-            return `Attacker Plan for Missing ${headerName} at ${location}:
+            return `What this means in simple terms: This is like a house with no security system, door locks, or window bars. The website is missing basic protective measures that browsers use to block attacks.
+
+Attacker Plan for Missing ${headerName} at ${location}:
 
 1. Header Analysis: The attacker uses tools like curl or browser developer tools to check what security headers are missing. Like checking if a house has security cameras or alarm systems.
 
@@ -587,7 +613,9 @@ Real-world example: Many banking websites have been targeted by clickjacking att
         }
         
         if (vulnType.includes('form') && vulnType.includes('security')) {
-            return `Attacker Plan for Form Security Issues at ${location}:
+            return `What this means in simple terms: This is like a store checkout that doesn't verify if you're really the person using the credit card. The website's forms can be tricked into doing things you didn't authorize.
+
+Attacker Plan for Form Security Issues at ${location}:
 
 1. Form Analysis: The attacker examines all forms on the website to understand how data is processed. Like a con artist studying their mark's routines and weaknesses.
 
@@ -603,7 +631,9 @@ Real-world example: Many e-commerce sites have been exploited through form manip
         }
         
         // Default plan for other vulnerability types
-        return `Attacker Plan for ${vuln.type} at ${location}:
+        return `What this means in simple terms: This is a security weakness that could allow attackers to gain unauthorized access or cause damage to the system or users.
+
+Attacker Plan for ${vuln.type} at ${location}:
 
 1. Vulnerability Assessment: The attacker identifies this specific security weakness and studies how it can be exploited. Like a thief examining a weak lock or broken window.
 
@@ -647,7 +677,9 @@ This type of vulnerability commonly leads to unauthorized access, data theft, or
         
         // Generate specific defense strategies based on vulnerability type and context
         if (vulnType.includes('xss') || vulnType.includes('cross-site scripting')) {
-            return `Developer Defense Plan for XSS at ${location}:
+            return `What this means for developers: You need to treat all user input like it could be malicious and clean it before displaying it on your website.
+
+Developer Defense Plan for XSS at ${location}:
 
 1. Input Validation: Set up strict input validation that only allows expected characters. Think of it like having a bouncer at a club who checks IDs and only lets in approved guests.
 
@@ -663,7 +695,9 @@ Real-world example: After the 2018 British Airways attack, they implemented stri
         }
         
         if (vulnType.includes('sql injection')) {
-            return `Developer Defense Plan for SQL Injection at ${location}:
+            return `What this means for developers: You need to separate your code from user data so that user input can't be treated as database commands.
+
+Developer Defense Plan for SQL Injection at ${location}:
 
 1. Prepared Statements: Replace all dynamic SQL queries with parameterized queries. This separates code from data, like having separate lanes for cars and pedestrians.
 
@@ -680,7 +714,9 @@ Real-world example: After the Equifax breach, many companies implemented mandato
         
         if (vulnType.includes('missing') && vulnType.includes('header')) {
             const headerName = evidence.match(/Header '([^']+)'/)?.[1] || 'security header';
-            return `Developer Defense Plan for Missing ${headerName} at ${location}:
+            return `What this means for developers: You need to tell browsers how to protect your users by setting proper security headers.
+
+Developer Defense Plan for Missing ${headerName} at ${location}:
 
 1. Header Implementation: Add the missing security header to your web server or application configuration. This is like installing a missing security feature on your building.
 
@@ -696,7 +732,9 @@ Real-world example: Major banks now use comprehensive security headers that have
         }
         
         if (vulnType.includes('form') && vulnType.includes('security')) {
-            return `Developer Defense Plan for Form Security Issues at ${location}:
+            return `What this means for developers: You need to verify that form submissions are legitimate and coming from authorized users.
+
+Developer Defense Plan for Form Security Issues at ${location}:
 
 1. CSRF Protection: Implement anti-CSRF tokens for all state-changing operations. Each form gets a unique token that must be validated on submission, like requiring a secret handshake.
 
@@ -712,7 +750,9 @@ Real-world example: E-commerce sites that implemented CSRF tokens and server-sid
         }
         
         // Default plan for other vulnerability types
-        return `Developer Defense Plan for ${vuln.type} at ${location}:
+        return `What this means for developers: This security issue needs to be addressed to prevent potential attacks and protect users.
+
+Developer Defense Plan for ${vuln.type} at ${location}:
 
 1. Immediate Assessment: Evaluate the scope and impact of this vulnerability in your codebase. Check if similar issues exist in other parts of your application.
 
@@ -995,6 +1035,22 @@ Strict-Transport-Security: max-age=31536000; includeSubDomains</code></pre>`
         this.currentScanId = null;
         if (this.scanInterval) {
             clearInterval(this.scanInterval);
+        }
+    }
+}
+
+// Global function for accordion toggle
+function toggleAccordion(accordionId) {
+    const content = document.getElementById(accordionId);
+    const chevron = document.getElementById(accordionId + '-chevron');
+    
+    if (content && chevron) {
+        if (content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            chevron.style.transform = 'rotate(180deg)';
+        } else {
+            content.classList.add('hidden');
+            chevron.style.transform = 'rotate(0deg)';
         }
     }
 }
