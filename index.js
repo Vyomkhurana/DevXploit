@@ -15,7 +15,7 @@ let zapAvailable = false;
 // Check ZAP availability on startup
 async function checkZAPAvailability() {
   try {
-    console.log('🔍 Testing ZAP connection on port 8081...');
+    console.log('Testing ZAP connection on port 8081...');
     
     // Try multiple endpoints and methods
     const endpoints = [
@@ -27,7 +27,7 @@ async function checkZAPAvailability() {
     
     for (const endpoint of endpoints) {
       try {
-        console.log(`🧪 Testing endpoint: ${ZAP_BASE_URL}${endpoint}`);
+        console.log(`Testing endpoint: ${ZAP_BASE_URL}${endpoint}`);
         const response = await axios.get(`${ZAP_BASE_URL}${endpoint}`, {
           timeout: 5000,
           headers: {
@@ -41,19 +41,19 @@ async function checkZAPAvailability() {
         
         if (response.status === 200) {
           zapAvailable = true;
-          console.log(`🔥 OWASP ZAP connected via ${endpoint}`);
-          console.log(`📊 Response status: ${response.status}`);
+          console.log(`OWASP ZAP connected via ${endpoint}`);
+          console.log(`Response status: ${response.status}`);
           return true;
         }
       } catch (endpointError) {
-        console.log(`❌ Endpoint ${endpoint} failed: ${endpointError.message}`);
+        console.log(`Endpoint ${endpoint} failed: ${endpointError.message}`);
       }
     }
     
   } catch (error) {
     zapAvailable = false;
-    console.log('⚠️ OWASP ZAP not available - continuing with passive scanning only');
-    console.log(`🔧 Error details: ${error.message}`);
+    console.log('OWASP ZAP not available - continuing with passive scanning only');
+    console.log(`Error details: ${error.message}`);
     return false;
   }
   
@@ -68,10 +68,10 @@ async function performZAPActiveScan(targetUrl) {
   }
 
   try {
-    console.log(`🔥 Starting ZAP active scan for: ${targetUrl}`);
+    console.log(`Starting ZAP active scan for: ${targetUrl}`);
 
     // Spider the target first - try different API formats
-    console.log("🕷️ ZAP Spider scanning...");
+    console.log("ZAP Spider scanning...");
     let spiderResponse;
     try {
       spiderResponse = await axios.get(
@@ -106,7 +106,7 @@ async function performZAPActiveScan(targetUrl) {
         }
       );
       spiderProgress = parseInt(statusResponse.data.status);
-      console.log(`🕷️ Spider progress: ${spiderProgress}%`);
+      console.log(`Spider progress: ${spiderProgress}%`);
       if (spiderProgress >= 100) spiderComplete = true;
     }
 
@@ -121,7 +121,7 @@ async function performZAPActiveScan(targetUrl) {
 
     const activeScanId = activeScanResponse.data.scan;
 
-    // Wait for active scan to complete (with timeout for better UX)
+    // Wait for active scan to complete
     let scanComplete = false;
     let scanProgress = 0;
     let scanTimeout = 0;
@@ -140,7 +140,7 @@ async function performZAPActiveScan(targetUrl) {
 
       // Return early results at 10% to improve UX
       if (scanProgress >= 10 && scanTimeout > 20) {
-        console.log("🚀 Returning early ZAP results for better UX");
+        console.log("Returning early ZAP results");
         break;
       }
 
@@ -177,7 +177,7 @@ async function performZAPActiveScan(targetUrl) {
       allInstances: alert.instances || [{ uri: targetUrl }]
     }));
 
-    console.log(`🔥 ZAP found ${zapVulns.length} vulnerabilities`);
+    console.log(`ZAP found ${zapVulns.length} vulnerabilities`);
 
     return {
       vulnerabilities: zapVulns,
@@ -188,7 +188,7 @@ async function performZAPActiveScan(targetUrl) {
       },
     };
   } catch (error) {
-    console.error("❌ ZAP scan failed:", error.message);
+    console.error("ZAP scan failed:", error.message);
     return { error: error.message };
   }
 }
@@ -213,10 +213,10 @@ function loadScanResults() {
       const data = fs.readFileSync(SCAN_RESULTS_FILE, "utf8");
       const results = JSON.parse(data);
       scanResults = new Map(Object.entries(results));
-      console.log(`📁 Loaded ${scanResults.size} existing scan results`);
+      console.log(`Loaded ${scanResults.size} existing scan results`);
     }
   } catch (error) {
-    console.error("❌ Error loading scan results:", error.message);
+    console.error("Error loading scan results:", error.message);
     scanResults = new Map();
   }
 }
@@ -227,7 +227,7 @@ function saveScanResults() {
     fs.writeFileSync(SCAN_RESULTS_FILE, JSON.stringify(resultsObj, null, 2));
     console.log("💾 Scan results saved to file");
   } catch (error) {
-    console.error("❌ Error saving scan results:", error.message);
+    console.error("Error saving scan results:", error.message);
   }
 }
 
@@ -239,9 +239,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.set("view engine", "ejs");
 
-console.log("🚀 DevXploit Dashboard running on http://localhost:3000");
-console.log("🔥 Advanced Security Intelligence Platform");
-console.log("🎯 Think Like a Hacker, Build Like a Developer");
+console.log("DevXploit Security Platform - http://localhost:3000");
+console.log("Vulnerability Scanner and Security Analysis Tool");
 
 app.get("/", (req, res) => {
   try {
@@ -255,7 +254,7 @@ app.get("/", (req, res) => {
   }
 });
 
-// Enhanced vulnerability scanning function
+// Vulnerability scanning function
 async function performComprehensiveVulnerabilityScanning(url) {
   const results = {
     url,
@@ -266,7 +265,7 @@ async function performComprehensiveVulnerabilityScanning(url) {
   };
 
   try {
-    console.log(`🔍 Starting comprehensive scan for: ${url}`);
+    console.log(`Starting comprehensive scan for: ${url}`);
 
     const response = await axios.get(url, {
       timeout: 10000,
@@ -284,7 +283,7 @@ async function performComprehensiveVulnerabilityScanning(url) {
       "x-xss-protection": headers["x-xss-protection"] || "Missing",
     };
 
-    console.log("🌐 Launching browser for dynamic analysis...");
+    console.log("Launching browser for dynamic analysis...");
     const browser = await puppeteer.launch({
       headless: true,
       args: [
@@ -312,7 +311,7 @@ async function performComprehensiveVulnerabilityScanning(url) {
       await page.goto(url, { waitUntil: "domcontentloaded", timeout: 10000 });
     } catch (gotoError) {
       console.log(
-        `⚠️ Browser navigation blocked, falling back to HTTP analysis only: ${gotoError.message}`
+        `Browser navigation blocked, falling back to HTTP analysis only: ${gotoError.message}`
       );
       // Continue with HTTP-only analysis
       await browser.close();
@@ -512,7 +511,7 @@ async function performComprehensiveVulnerabilityScanning(url) {
       };
 
       console.log(
-        `✅ HTTP-only scan completed for ${url} - Found ${results.vulnerabilities.length} issues`
+        `HTTP-only scan completed for ${url} - Found ${results.vulnerabilities.length} issues`
       );
       return results;
     }
@@ -583,10 +582,10 @@ async function performComprehensiveVulnerabilityScanning(url) {
 
     await browser.close();
     console.log(
-      `✅ Scan completed for ${url} - Found ${results.vulnerabilities.length} issues`
+      `Scan completed for ${url} - Found ${results.vulnerabilities.length} issues`
     );
   } catch (error) {
-    console.error(`❌ Error during scan:`, error.message);
+    console.error(`Error during scan:`, error.message);
     results.error = error.message;
   }
 
@@ -653,8 +652,8 @@ app.post("/api/scan", async (req, res) => {
       .toString(36)
       .substr(2, 9)}_${Date.now()}`;
 
-    console.log(`🚀 Starting ${scanType || "basic"} scan for: ${url}`);
-    console.log(`📋 Scan ID: ${scanId}`);
+    console.log(`Starting ${scanType || "basic"} scan for: ${url}`);
+    console.log(`Scan ID: ${scanId}`);
 
     const scanResult = {
       id: scanId,
@@ -690,7 +689,7 @@ app.post("/api/scan", async (req, res) => {
         let zapResults = null;
         if (zapAvailable && scanType === "comprehensive") {
           try {
-            console.log("🔥 Initiating ZAP active scan...");
+            console.log("Initiating ZAP active scan...");
             scanResult.progress = 60;
             scanResult.currentStep =
               "ZAP scanning for SQL injection, XSS and other vulnerabilities...";
@@ -706,7 +705,7 @@ app.post("/api/scan", async (req, res) => {
                 ...zapResults.vulnerabilities,
               ];
               console.log(
-                `🔥 ZAP added ${zapResults.vulnerabilities.length} vulnerabilities`
+                `ZAP added ${zapResults.vulnerabilities.length} vulnerabilities`
               );
             }
 
@@ -716,7 +715,7 @@ app.post("/api/scan", async (req, res) => {
             scanResults.set(scanId, scanResult);
             saveScanResults();
           } catch (zapError) {
-            console.error("❌ ZAP scan failed:", zapError.message);
+            console.error("ZAP scan failed:", zapError.message);
             zapResults = { error: zapError.message };
           }
         } else {
@@ -780,12 +779,12 @@ app.post("/api/scan", async (req, res) => {
         scanResults.set(scanId, scanResult);
         saveScanResults();
 
-        console.log(`✅ Scan ${scanId} completed for ${url}`);
+        console.log(`Scan ${scanId} completed for ${url}`);
         console.log(
-          `🚨 Total vulnerabilities found: ${vulnerabilityResults.vulnerabilities.length}`
+          `Total vulnerabilities found: ${vulnerabilityResults.vulnerabilities.length}`
         );
       } catch (error) {
-        console.error(`❌ Scan ${scanId} failed:`, error);
+        console.error(`Scan ${scanId} failed:`, error);
         scanResult.status = "failed";
         scanResult.error = error.message;
         scanResult.endTime = new Date().toISOString();
@@ -801,7 +800,7 @@ app.post("/api/scan", async (req, res) => {
       statusUrl: `/api/scan/${scanId}`,
     });
   } catch (error) {
-    console.error("❌ Error starting scan:", error);
+    console.error("Error starting scan:", error);
     res.status(500).json({ error: "Failed to start scan" });
   }
 });
@@ -812,14 +811,14 @@ app.get("/api/scan/:scanId", (req, res) => {
   const scanResult = scanResults.get(scanId);
 
   if (!scanResult) {
-    console.log(`❌ Scan not found: ${scanId}`);
+    console.log(`Scan not found: ${scanId}`);
     console.log(
-      `📊 Available scans: ${Array.from(scanResults.keys()).join(", ")}`
+      `Available scans: ${Array.from(scanResults.keys()).join(", ")}`
     );
     return res.status(404).json({ error: "Scan not found" });
   }
 
-  console.log(`✅ Returning scan result for: ${scanId}`);
+  console.log(`Returning scan result for: ${scanId}`);
   res.json(scanResult);
 });
 
@@ -854,9 +853,9 @@ app.get("/api/zap-status", async (req, res) => {
 });
 
 app.listen(PORT, async () => {
-  console.log(`\n🌟 Server running on port ${PORT}`);
-  console.log(`🔗 Open: http://localhost:${PORT}`);
-  console.log(`📊 Total stored scans: ${scanResults.size}`);
+  console.log(`\nServer running on port ${PORT}`);
+  console.log(`Open: http://localhost:${PORT}`);
+  console.log(`Total stored scans: ${scanResults.size}`);
 
   // Check ZAP availability on startup
   await checkZAPAvailability();

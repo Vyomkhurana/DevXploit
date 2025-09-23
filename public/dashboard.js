@@ -375,7 +375,7 @@ class DevXploitDashboard {
     }
 
     displayResults(results) {
-        console.log('🎯 Displaying results:', results);
+        console.log('Displaying results:', results);
         
         // Update kill chain visualization
         this.updateKillChain(results.aiAnalysis?.killChainSteps);
@@ -393,7 +393,7 @@ class DevXploitDashboard {
         
         // Update security score (this is the main fix)
         if (results.vulnerabilities && results.vulnerabilities.severity) {
-            console.log('📊 Updating security score with:', results.vulnerabilities.severity);
+            console.log('Updating security score with:', results.vulnerabilities.severity);
             this.updateSecurityScore(results.vulnerabilities.severity);
             
             // Force chart update to show correct score
@@ -421,16 +421,16 @@ class DevXploitDashboard {
         
         // Show AI analysis section if we have AI data
         if (results.aiAnalysis) {
-            console.log('📊 Showing AI analysis section');
+            console.log('Showing AI analysis section');
             const aiSection = document.getElementById('aiAnalysisSection');
             if (aiSection) {
                 aiSection.style.display = 'block';
             } else {
-                console.error('❌ AI analysis section not found in DOM');
+                console.error('AI analysis section not found in DOM');
             }
         }
         
-        console.log('✅ Results display complete');
+        console.log('Results display complete');
     }
 
     addRealTimeEvent(icon, color, text) {
@@ -1073,12 +1073,12 @@ Strict-Transport-Security: max-age=31536000; includeSubDomains</code></pre>`
         
         if (scoreLabel) {
             scoreLabel.textContent = severity.score || 0;
-            console.log('📊 Updated score label to:', severity.score);
+            console.log('Updated score label to:', severity.score);
         }
         
         if (scoreState) {
             scoreState.textContent = severity.grade || 'Unknown';
-            console.log('📊 Updated score state to:', severity.grade);
+            console.log('Updated score state to:', severity.grade);
         }
 
         // Update the doughnut chart with proper score calculation
