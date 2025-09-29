@@ -1,6 +1,9 @@
-# DevXploit - Security Analysis Platform
+<center><img width="200" height="200" alt="favicon" src="https://github.com/user-attachments/assets/049b26f9-d152-4e60-9904-51a8003390ab" /></center>
 
-A comprehensive web application security scanner built with Node.js and integrated with OWASP ZAP for professional vulnerability assessment.
+# DevXploit - Think Like a Hacker, Build Like a Developer
+
+A revolutionary security visualisation platform that transforms vulnerability scanning into an interactive storytelling experience for developers and security teams.
+
 
 ## 🔍 Features
 
@@ -29,6 +32,15 @@ A comprehensive web application security scanner built with Node.js and integrat
 - **Browser Automation**: Puppeteer
 - **Charts**: Chart.js
 - **Icons**: Lucide Icons
+
+## DevXploit in Action
+![WhatsApp Image 2025-09-29 at 22 40 59_4a07bff5](https://github.com/user-attachments/assets/dae713f7-3f31-4c7f-ab35-069f2805a59f)
+!![WhatsApp Image 2025-09-29 at 22 43 55_cf47df4a](https://github.com/user-attachments/assets/4f9806b7-3169-4638-bfd5-58352016fc19)
+![WhatsApp Image 2025-09-29 at 22 44 43_f9d9ca6e](https://github.com/user-attachments/assets/14592adc-335f-497c-a8e0-9e01c445eaf5)
+![WhatsApp Image 2025-09-29 at 22 45 02_698f5a46](https://github.com/user-attachments/assets/bce1da04-1184-4958-a7c9-5ca594088037)
+![WhatsApp Image 2025-09-29 at 22 45 22_d2e98d0c](https://github.com/user-attachments/assets/519a5c73-bccd-4a19-8de7-26b450f4ed12)
+![WhatsApp Image 2025-09-29 at 22 45 34_4f7c0064](https://github.com/user-attachments/assets/656ced65-9c8e-4dd8-b628-b3c4fd8384be)
+
 
 ## 📋 Prerequisites
 
